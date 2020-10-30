@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"context"
@@ -54,13 +54,13 @@ func TestSnapshots_ListVolume(t *testing.T) {
 	}
 }
 
-func TestSnapshots_ListDroplet(t *testing.T) {
+func TestSnapshots_ListServer(t *testing.T) {
 	setup()
 	defer teardown()
 
 	mux.HandleFunc("/v2/snapshots", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, http.MethodGet)
-		expected := "droplet"
+		expected := "server"
 		actual := r.URL.Query().Get("resource_type")
 		if actual != expected {
 			t.Errorf("'resource_type' query = %v, expected %v", actual, expected)
@@ -70,14 +70,14 @@ func TestSnapshots_ListDroplet(t *testing.T) {
 	})
 
 	ctx := context.Background()
-	snapshots, _, err := client.Snapshots.ListDroplet(ctx, nil)
+	snapshots, _, err := client.Snapshots.ListServer(ctx, nil)
 	if err != nil {
-		t.Errorf("Snapshots.ListDroplet returned error: %v", err)
+		t.Errorf("Snapshots.ListServer returned error: %v", err)
 	}
 
 	expected := []Snapshot{{ID: "1"}, {ID: "2", SizeGigaBytes: 4.84}}
 	if !reflect.DeepEqual(snapshots, expected) {
-		t.Errorf("Snapshots.ListDroplet returned %+v, expected %+v", snapshots, expected)
+		t.Errorf("Snapshots.ListServer returned %+v, expected %+v", snapshots, expected)
 	}
 }
 
@@ -171,7 +171,7 @@ func TestSnapshot_String(t *testing.T) {
 		ID:            "1",
 		Name:          "Snapsh176ot",
 		ResourceID:    "0",
-		ResourceType:  "droplet",
+		ResourceType:  "server",
 		Regions:       []string{"one"},
 		MinDiskSize:   20,
 		SizeGigaBytes: 4.84,
@@ -180,7 +180,7 @@ func TestSnapshot_String(t *testing.T) {
 	}
 
 	stringified := snapshot.String()
-	expected := `godo.Snapshot{ID:"1", Name:"Snapsh176ot", ResourceID:"0", ResourceType:"droplet", Regions:["one"], MinDiskSize:20, SizeGigaBytes:4.84, Created:"2013-11-27T09:24:55Z", Tags:["one" "two"]}`
+	expected := `binarylane.Snapshot{ID:"1", Name:"Snapsh176ot", ResourceID:"0", ResourceType:"server", Regions:["one"], MinDiskSize:20, SizeGigaBytes:4.84, Created:"2013-11-27T09:24:55Z", Tags:["one" "two"]}`
 	if expected != stringified {
 		t.Errorf("Snapshot.String returned %+v, expected %+v", stringified, expected)
 	}

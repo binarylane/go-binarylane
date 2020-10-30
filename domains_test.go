@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"encoding/json"
@@ -509,7 +509,7 @@ func TestDomainRecord_String(t *testing.T) {
 	}
 
 	stringified := record.String()
-	expected := `godo.DomainRecord{ID:1, Type:"CNAME", Name:"example", Data:"@", Priority:10, Port:10, TTL:1800, Weight:10, Flags:1, Tag:"test"}`
+	expected := `binarylane.DomainRecord{ID:1, Type:"CNAME", Name:"example", Data:"@", Priority:10, Port:10, TTL:1800, Weight:10, Flags:1, Tag:"test"}`
 	if expected != stringified {
 		t.Errorf("DomainRecord.String returned %+v, expected %+v", stringified, expected)
 	}
@@ -529,7 +529,7 @@ func TestDomainRecordEditRequest_String(t *testing.T) {
 	}
 
 	stringified := record.String()
-	expected := `godo.DomainRecordEditRequest{Type:"CNAME", Name:"example", Data:"@", Priority:10, Port:10, TTL:1800, Weight:10, Flags:1, Tag:"test"}`
+	expected := `binarylane.DomainRecordEditRequest{Type:"CNAME", Name:"example", Data:"@", Priority:10, Port:10, TTL:1800, Weight:10, Flags:1, Tag:"test"}`
 	if expected != stringified {
 		t.Errorf("DomainRecordEditRequest.String returned %+v, expected %+v", stringified, expected)
 	}

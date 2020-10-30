@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"encoding/json"
@@ -8,14 +8,14 @@ import (
 	"testing"
 )
 
-func TestDroplets_ListDroplets(t *testing.T) {
+func TestServers_ListServers(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/droplets", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/servers", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `{
-			"droplets": [
+			"servers": [
 				{
 					"id": 1
 				},
@@ -29,33 +29,33 @@ func TestDroplets_ListDroplets(t *testing.T) {
 		}`)
 	})
 
-	droplets, resp, err := client.Droplets.List(ctx, nil)
+	servers, resp, err := client.Servers.List(ctx, nil)
 	if err != nil {
-		t.Errorf("Droplets.List returned error: %v", err)
+		t.Errorf("Servers.List returned error: %v", err)
 	}
 
-	expectedDroplets := []Droplet{{ID: 1}, {ID: 2}}
-	if !reflect.DeepEqual(droplets, expectedDroplets) {
-		t.Errorf("Droplets.List\nDroplets: got=%#v\nwant=%#v", droplets, expectedDroplets)
+	expectedServers := []Server{{ID: 1}, {ID: 2}}
+	if !reflect.DeepEqual(servers, expectedServers) {
+		t.Errorf("Servers.List\nServers: got=%#v\nwant=%#v", servers, expectedServers)
 	}
 	expectedMeta := &Meta{Total: 2}
 	if !reflect.DeepEqual(resp.Meta, expectedMeta) {
-		t.Errorf("Droplets.List\nMeta: got=%#v\nwant=%#v", resp.Meta, expectedMeta)
+		t.Errorf("Servers.List\nMeta: got=%#v\nwant=%#v", resp.Meta, expectedMeta)
 	}
 }
 
-func TestDroplets_ListDropletsByTag(t *testing.T) {
+func TestServers_ListServersByTag(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/droplets", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/servers", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("tag_name") != "testing-1" {
-			t.Errorf("Droplets.ListByTag did not request with a tag parameter")
+			t.Errorf("Servers.ListByTag did not request with a tag parameter")
 		}
 
 		testMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `{
-			"droplets": [
+			"servers": [
 				{
 					"id": 1
 				},
@@ -69,35 +69,35 @@ func TestDroplets_ListDropletsByTag(t *testing.T) {
 		}`)
 	})
 
-	droplets, resp, err := client.Droplets.ListByTag(ctx, "testing-1", nil)
+	servers, resp, err := client.Servers.ListByTag(ctx, "testing-1", nil)
 	if err != nil {
-		t.Errorf("Droplets.ListByTag returned error: %v", err)
+		t.Errorf("Servers.ListByTag returned error: %v", err)
 	}
 
-	expectedDroplets := []Droplet{{ID: 1}, {ID: 2}}
-	if !reflect.DeepEqual(droplets, expectedDroplets) {
-		t.Errorf("Droplets.ListByTag returned droplets %+v, expected %+v", droplets, expectedDroplets)
+	expectedServers := []Server{{ID: 1}, {ID: 2}}
+	if !reflect.DeepEqual(servers, expectedServers) {
+		t.Errorf("Servers.ListByTag returned servers %+v, expected %+v", servers, expectedServers)
 	}
 	expectedMeta := &Meta{Total: 2}
 	if !reflect.DeepEqual(resp.Meta, expectedMeta) {
-		t.Errorf("Droplets.ListByTag returned meta %+v, expected %+v", resp.Meta, expectedMeta)
+		t.Errorf("Servers.ListByTag returned meta %+v, expected %+v", resp.Meta, expectedMeta)
 	}
 }
 
-func TestDroplets_ListDropletsMultiplePages(t *testing.T) {
+func TestServers_ListServersMultiplePages(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/droplets", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/servers", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, http.MethodGet)
 
-		dr := dropletsRoot{
-			Droplets: []Droplet{
+		dr := serversRoot{
+			Servers: []Server{
 				{ID: 1},
 				{ID: 2},
 			},
 			Links: &Links{
-				Pages: &Pages{Next: "http://example.com/v2/droplets/?page=2"},
+				Pages: &Pages{Next: "http://example.com/v2/servers/?page=2"},
 			},
 		}
 
@@ -109,7 +109,7 @@ func TestDroplets_ListDropletsMultiplePages(t *testing.T) {
 		fmt.Fprint(w, string(b))
 	})
 
-	_, resp, err := client.Droplets.List(ctx, nil)
+	_, resp, err := client.Servers.List(ctx, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -117,30 +117,30 @@ func TestDroplets_ListDropletsMultiplePages(t *testing.T) {
 	checkCurrentPage(t, resp, 1)
 }
 
-func TestDroplets_RetrievePageByNumber(t *testing.T) {
+func TestServers_RetrievePageByNumber(t *testing.T) {
 	setup()
 	defer teardown()
 
 	jBlob := `
 	{
-		"droplets": [{"id":1},{"id":2}],
+		"servers": [{"id":1},{"id":2}],
 		"links":{
 			"pages":{
-				"next":"http://example.com/v2/droplets/?page=3",
-				"prev":"http://example.com/v2/droplets/?page=1",
-				"last":"http://example.com/v2/droplets/?page=3",
-				"first":"http://example.com/v2/droplets/?page=1"
+				"next":"http://example.com/v2/servers/?page=3",
+				"prev":"http://example.com/v2/servers/?page=1",
+				"last":"http://example.com/v2/servers/?page=3",
+				"first":"http://example.com/v2/servers/?page=1"
 			}
 		}
 	}`
 
-	mux.HandleFunc("/v2/droplets", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/servers", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, jBlob)
 	})
 
 	opt := &ListOptions{Page: 2}
-	_, resp, err := client.Droplets.List(ctx, opt)
+	_, resp, err := client.Servers.List(ctx, opt)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -148,47 +148,47 @@ func TestDroplets_RetrievePageByNumber(t *testing.T) {
 	checkCurrentPage(t, resp, 2)
 }
 
-func TestDroplets_GetDroplet(t *testing.T) {
+func TestServers_GetServer(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/droplets/12345", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/servers/12345", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, http.MethodGet)
-		fmt.Fprint(w, `{"droplet":{"id":12345}}`)
+		fmt.Fprint(w, `{"server":{"id":12345}}`)
 	})
 
-	droplets, _, err := client.Droplets.Get(ctx, 12345)
+	servers, _, err := client.Servers.Get(ctx, 12345)
 	if err != nil {
-		t.Errorf("Droplet.Get returned error: %v", err)
+		t.Errorf("Server.Get returned error: %v", err)
 	}
 
-	expected := &Droplet{ID: 12345}
-	if !reflect.DeepEqual(droplets, expected) {
-		t.Errorf("Droplets.Get\n got=%#v\nwant=%#v", droplets, expected)
+	expected := &Server{ID: 12345}
+	if !reflect.DeepEqual(servers, expected) {
+		t.Errorf("Servers.Get\n got=%#v\nwant=%#v", servers, expected)
 	}
 }
 
-func TestDroplets_Create(t *testing.T) {
+func TestServers_Create(t *testing.T) {
 	setup()
 	defer teardown()
 
-	createRequest := &DropletCreateRequest{
+	createRequest := &ServerCreateRequest{
 		Name:   "name",
 		Region: "region",
 		Size:   "size",
-		Image: DropletCreateImage{
+		Image: ServerCreateImage{
 			ID: 1,
 		},
-		Volumes: []DropletCreateVolume{
+		Volumes: []ServerCreateVolume{
 			{Name: "hello-im-a-volume"},
 			{ID: "hello-im-another-volume"},
 			{Name: "hello-im-still-a-volume", ID: "should be ignored due to Name"},
 		},
-		Tags:    []string{"one", "two"},
-		VPCUUID: "880b7f98-f062-404d-b33c-458d545696f6",
+		Tags:  []string{"one", "two"},
+		VPCID: 2,
 	}
 
-	mux.HandleFunc("/v2/droplets", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/servers", func(w http.ResponseWriter, r *http.Request) {
 		expected := map[string]interface{}{
 			"name":               "name",
 			"region":             "region",
@@ -204,14 +204,14 @@ func TestDroplets_Create(t *testing.T) {
 				map[string]interface{}{"id": "hello-im-another-volume"},
 				map[string]interface{}{"name": "hello-im-still-a-volume"},
 			},
-			"tags":     []interface{}{"one", "two"},
-			"vpc_uuid": "880b7f98-f062-404d-b33c-458d545696f6",
+			"tags":   []interface{}{"one", "two"},
+			"vpc_id": float64(2),
 		}
 		jsonBlob := `
 {
-  "droplet": {
+  "server": {
     "id": 1,
-    "vpc_uuid": "880b7f98-f062-404d-b33c-458d545696f6"
+    "vpc_id": 2
   },
   "links": {
     "actions": [
@@ -238,18 +238,18 @@ func TestDroplets_Create(t *testing.T) {
 		fmt.Fprintf(w, jsonBlob)
 	})
 
-	droplet, resp, err := client.Droplets.Create(ctx, createRequest)
+	server, resp, err := client.Servers.Create(ctx, createRequest)
 	if err != nil {
-		t.Errorf("Droplets.Create returned error: %v", err)
+		t.Errorf("Servers.Create returned error: %v", err)
 	}
 
-	if id := droplet.ID; id != 1 {
+	if id := server.ID; id != 1 {
 		t.Errorf("expected id '%d', received '%d'", 1, id)
 	}
 
-	vpcid := "880b7f98-f062-404d-b33c-458d545696f6"
-	if id := droplet.VPCUUID; id != vpcid {
-		t.Errorf("expected VPC uuid '%s', received '%s'", vpcid, id)
+	vpcid := 2
+	if id := server.VPCID; id != vpcid {
+		t.Errorf("expected VPC id '%d', received '%d'", vpcid, id)
 	}
 
 	if a := resp.Links.Actions[0]; a.ID != 1 {
@@ -257,22 +257,22 @@ func TestDroplets_Create(t *testing.T) {
 	}
 }
 
-func TestDroplets_CreateMultiple(t *testing.T) {
+func TestServers_CreateMultiple(t *testing.T) {
 	setup()
 	defer teardown()
 
-	createRequest := &DropletMultiCreateRequest{
+	createRequest := &ServerMultiCreateRequest{
 		Names:  []string{"name1", "name2"},
 		Region: "region",
 		Size:   "size",
-		Image: DropletCreateImage{
+		Image: ServerCreateImage{
 			ID: 1,
 		},
-		Tags:    []string{"one", "two"},
-		VPCUUID: "880b7f98-f062-404d-b33c-458d545696f6",
+		Tags:  []string{"one", "two"},
+		VPCID: 2,
 	}
 
-	mux.HandleFunc("/v2/droplets", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/servers", func(w http.ResponseWriter, r *http.Request) {
 		expected := map[string]interface{}{
 			"names":              []interface{}{"name1", "name2"},
 			"region":             "region",
@@ -284,18 +284,18 @@ func TestDroplets_CreateMultiple(t *testing.T) {
 			"private_networking": false,
 			"monitoring":         false,
 			"tags":               []interface{}{"one", "two"},
-			"vpc_uuid":           "880b7f98-f062-404d-b33c-458d545696f6",
+			"vpc_id":             float64(2),
 		}
 		jsonBlob := `
 {
-  "droplets": [
+  "servers": [
     {
       "id": 1,
-	  "vpc_uuid": "880b7f98-f062-404d-b33c-458d545696f6"
+	  "vpc_id": 2
     },
     {
       "id": 2,
-	  "vpc_uuid": "880b7f98-f062-404d-b33c-458d545696f6"
+	  "vpc_id": 2
     }
   ],
   "links": {
@@ -323,24 +323,24 @@ func TestDroplets_CreateMultiple(t *testing.T) {
 		fmt.Fprintf(w, jsonBlob)
 	})
 
-	droplets, resp, err := client.Droplets.CreateMultiple(ctx, createRequest)
+	servers, resp, err := client.Servers.CreateMultiple(ctx, createRequest)
 	if err != nil {
-		t.Errorf("Droplets.CreateMultiple returned error: %v", err)
+		t.Errorf("Servers.CreateMultiple returned error: %v", err)
 	}
 
-	if id := droplets[0].ID; id != 1 {
+	if id := servers[0].ID; id != 1 {
 		t.Errorf("expected id '%d', received '%d'", 1, id)
 	}
-	if id := droplets[1].ID; id != 2 {
+	if id := servers[1].ID; id != 2 {
 		t.Errorf("expected id '%d', received '%d'", 2, id)
 	}
 
-	vpcid := "880b7f98-f062-404d-b33c-458d545696f6"
-	if id := droplets[0].VPCUUID; id != vpcid {
-		t.Errorf("expected VPC uuid '%s', received '%s'", vpcid, id)
+	vpcid := 2
+	if id := servers[0].VPCID; id != vpcid {
+		t.Errorf("expected VPC id '%d', received '%d'", vpcid, id)
 	}
-	if id := droplets[1].VPCUUID; id != vpcid {
-		t.Errorf("expected VPC uuid '%s', received '%s'", vpcid, id)
+	if id := servers[1].VPCID; id != vpcid {
+		t.Errorf("expected VPC id '%d', received '%d'", vpcid, id)
 	}
 
 	if a := resp.Links.Actions[0]; a.ID != 1 {
@@ -348,43 +348,43 @@ func TestDroplets_CreateMultiple(t *testing.T) {
 	}
 }
 
-func TestDroplets_Destroy(t *testing.T) {
+func TestServers_Destroy(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/droplets/12345", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/servers/12345", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, http.MethodDelete)
 	})
 
-	_, err := client.Droplets.Delete(ctx, 12345)
+	_, err := client.Servers.Delete(ctx, 12345)
 	if err != nil {
-		t.Errorf("Droplet.Delete returned error: %v", err)
+		t.Errorf("Server.Delete returned error: %v", err)
 	}
 }
 
-func TestDroplets_DestroyByTag(t *testing.T) {
+func TestServers_DestroyByTag(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/droplets", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/servers", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("tag_name") != "testing-1" {
-			t.Errorf("Droplets.DeleteByTag did not request with a tag parameter")
+			t.Errorf("Servers.DeleteByTag did not request with a tag parameter")
 		}
 
 		testMethod(t, r, http.MethodDelete)
 	})
 
-	_, err := client.Droplets.DeleteByTag(ctx, "testing-1")
+	_, err := client.Servers.DeleteByTag(ctx, "testing-1")
 	if err != nil {
-		t.Errorf("Droplet.Delete returned error: %v", err)
+		t.Errorf("Server.Delete returned error: %v", err)
 	}
 }
 
-func TestDroplets_Kernels(t *testing.T) {
+func TestServers_Kernels(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/droplets/12345/kernels", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/servers/12345/kernels", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `{
 			"kernels": [
@@ -402,26 +402,26 @@ func TestDroplets_Kernels(t *testing.T) {
 	})
 
 	opt := &ListOptions{Page: 2}
-	kernels, resp, err := client.Droplets.Kernels(ctx, 12345, opt)
+	kernels, resp, err := client.Servers.Kernels(ctx, 12345, opt)
 	if err != nil {
-		t.Errorf("Droplets.Kernels returned error: %v", err)
+		t.Errorf("Servers.Kernels returned error: %v", err)
 	}
 
 	expectedKernels := []Kernel{{ID: 1}, {ID: 2}}
 	if !reflect.DeepEqual(kernels, expectedKernels) {
-		t.Errorf("Droplets.Kernels\nKernels got=%#v\nwant=%#v", kernels, expectedKernels)
+		t.Errorf("Servers.Kernels\nKernels got=%#v\nwant=%#v", kernels, expectedKernels)
 	}
 	expectedMeta := &Meta{Total: 2}
 	if !reflect.DeepEqual(resp.Meta, expectedMeta) {
-		t.Errorf("Droplets.Kernels\nMeta: got=%#v\nwant=%#v", resp.Meta, expectedMeta)
+		t.Errorf("Servers.Kernels\nMeta: got=%#v\nwant=%#v", resp.Meta, expectedMeta)
 	}
 }
 
-func TestDroplets_Snapshots(t *testing.T) {
+func TestServers_Snapshots(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/droplets/12345/snapshots", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/servers/12345/snapshots", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `{
 			"snapshots": [
@@ -439,26 +439,26 @@ func TestDroplets_Snapshots(t *testing.T) {
 	})
 
 	opt := &ListOptions{Page: 2}
-	snapshots, resp, err := client.Droplets.Snapshots(ctx, 12345, opt)
+	snapshots, resp, err := client.Servers.Snapshots(ctx, 12345, opt)
 	if err != nil {
-		t.Errorf("Droplets.Snapshots returned error: %v", err)
+		t.Errorf("Servers.Snapshots returned error: %v", err)
 	}
 
 	expectedSnapshots := []Image{{ID: 1}, {ID: 2}}
 	if !reflect.DeepEqual(snapshots, expectedSnapshots) {
-		t.Errorf("Droplets.Snapshots\nSnapshots got=%#v\nwant=%#v", snapshots, expectedSnapshots)
+		t.Errorf("Servers.Snapshots\nSnapshots got=%#v\nwant=%#v", snapshots, expectedSnapshots)
 	}
 	expectedMeta := &Meta{Total: 2}
 	if !reflect.DeepEqual(resp.Meta, expectedMeta) {
-		t.Errorf("Droplets.Snapshots\nMeta: got=%#v\nwant=%#v", resp.Meta, expectedMeta)
+		t.Errorf("Servers.Snapshots\nMeta: got=%#v\nwant=%#v", resp.Meta, expectedMeta)
 	}
 }
 
-func TestDroplets_Backups(t *testing.T) {
+func TestServers_Backups(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/droplets/12345/backups", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/servers/12345/backups", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `{
 			"backups": [
@@ -476,26 +476,26 @@ func TestDroplets_Backups(t *testing.T) {
 	})
 
 	opt := &ListOptions{Page: 2}
-	backups, resp, err := client.Droplets.Backups(ctx, 12345, opt)
+	backups, resp, err := client.Servers.Backups(ctx, 12345, opt)
 	if err != nil {
-		t.Errorf("Droplets.Backups returned error: %v", err)
+		t.Errorf("Servers.Backups returned error: %v", err)
 	}
 
 	expectedBackups := []Image{{ID: 1}, {ID: 2}}
 	if !reflect.DeepEqual(backups, expectedBackups) {
-		t.Errorf("Droplets.Backups\nBackups got=%#v\nwant=%#v", backups, expectedBackups)
+		t.Errorf("Servers.Backups\nBackups got=%#v\nwant=%#v", backups, expectedBackups)
 	}
 	expectedMeta := &Meta{Total: 2}
 	if !reflect.DeepEqual(resp.Meta, expectedMeta) {
-		t.Errorf("Droplets.Backups\nMeta: got=%#v\nwant=%#v", resp.Meta, expectedMeta)
+		t.Errorf("Servers.Backups\nMeta: got=%#v\nwant=%#v", resp.Meta, expectedMeta)
 	}
 }
 
-func TestDroplets_Actions(t *testing.T) {
+func TestServers_Actions(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/droplets/12345/actions", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/servers/12345/actions", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, `{
 			"actions": [
@@ -513,38 +513,38 @@ func TestDroplets_Actions(t *testing.T) {
 	})
 
 	opt := &ListOptions{Page: 2}
-	actions, resp, err := client.Droplets.Actions(ctx, 12345, opt)
+	actions, resp, err := client.Servers.Actions(ctx, 12345, opt)
 	if err != nil {
-		t.Errorf("Droplets.Actions returned error: %v", err)
+		t.Errorf("Servers.Actions returned error: %v", err)
 	}
 
 	expectedActions := []Action{{ID: 1}, {ID: 2}}
 	if !reflect.DeepEqual(actions, expectedActions) {
-		t.Errorf("Droplets.Actions\nActions got=%#v\nwant=%#v", actions, expectedActions)
+		t.Errorf("Servers.Actions\nActions got=%#v\nwant=%#v", actions, expectedActions)
 	}
 	expectedMeta := &Meta{Total: 2}
 	if !reflect.DeepEqual(resp.Meta, expectedMeta) {
-		t.Errorf("Droplets.Actions\nMeta: got=%#v\nwant=%#v", resp.Meta, expectedMeta)
+		t.Errorf("Servers.Actions\nMeta: got=%#v\nwant=%#v", resp.Meta, expectedMeta)
 	}
 }
 
-func TestDroplets_Neighbors(t *testing.T) {
+func TestServers_Neighbors(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/droplets/12345/neighbors", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/servers/12345/neighbors", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, http.MethodGet)
-		fmt.Fprint(w, `{"droplets": [{"id":1},{"id":2}]}`)
+		fmt.Fprint(w, `{"servers": [{"id":1},{"id":2}]}`)
 	})
 
-	neighbors, _, err := client.Droplets.Neighbors(ctx, 12345)
+	neighbors, _, err := client.Servers.Neighbors(ctx, 12345)
 	if err != nil {
-		t.Errorf("Droplets.Neighbors returned error: %v", err)
+		t.Errorf("Servers.Neighbors returned error: %v", err)
 	}
 
-	expected := []Droplet{{ID: 1}, {ID: 2}}
+	expected := []Server{{ID: 1}, {ID: 2}}
 	if !reflect.DeepEqual(neighbors, expected) {
-		t.Errorf("Droplets.Neighbors\n got=%#v\nwant=%#v", neighbors, expected)
+		t.Errorf("Servers.Neighbors\n got=%#v\nwant=%#v", neighbors, expected)
 	}
 }
 
@@ -556,7 +556,7 @@ func TestNetworkV4_String(t *testing.T) {
 	}
 
 	stringified := network.String()
-	expected := `godo.NetworkV4{IPAddress:"192.168.1.2", Netmask:"255.255.255.0", Gateway:"192.168.1.1", Type:""}`
+	expected := `binarylane.NetworkV4{IPAddress:"192.168.1.2", Netmask:"255.255.255.0", Gateway:"192.168.1.1", Type:""}`
 	if expected != stringified {
 		t.Errorf("NetworkV4.String\n got=%#v\nwant=%#v", stringified, expected)
 	}
@@ -570,14 +570,14 @@ func TestNetworkV6_String(t *testing.T) {
 		Gateway:   "2604:A880:0800:0010:0000:0000:0000:0001",
 	}
 	stringified := network.String()
-	expected := `godo.NetworkV6{IPAddress:"2604:A880:0800:0010:0000:0000:02DD:4001", Netmask:64, Gateway:"2604:A880:0800:0010:0000:0000:0000:0001", Type:""}`
+	expected := `binarylane.NetworkV6{IPAddress:"2604:A880:0800:0010:0000:0000:02DD:4001", Netmask:64, Gateway:"2604:A880:0800:0010:0000:0000:0000:0001", Type:""}`
 	if expected != stringified {
 		t.Errorf("NetworkV6.String\n got=%#v\nwant=%#v", stringified, expected)
 	}
 }
 
-func TestDroplets_IPMethods(t *testing.T) {
-	var d Droplet
+func TestServers_IPMethods(t *testing.T) {
+	var d Server
 
 	ipv6 := "1000:1000:1000:1000:0000:0000:004D:B001"
 
@@ -597,7 +597,7 @@ func TestDroplets_IPMethods(t *testing.T) {
 	}
 
 	if got, expected := ip, "192.168.0.1"; got != expected {
-		t.Errorf("Droplet.PublicIPv4 returned %s; expected %s", got, expected)
+		t.Errorf("Server.PublicIPv4 returned %s; expected %s", got, expected)
 	}
 
 	ip, err = d.PrivateIPv4()
@@ -606,7 +606,7 @@ func TestDroplets_IPMethods(t *testing.T) {
 	}
 
 	if got, expected := ip, "10.0.0.1"; got != expected {
-		t.Errorf("Droplet.PrivateIPv4 returned %s; expected %s", got, expected)
+		t.Errorf("Server.PrivateIPv4 returned %s; expected %s", got, expected)
 	}
 
 	ip, err = d.PublicIPv6()
@@ -615,6 +615,6 @@ func TestDroplets_IPMethods(t *testing.T) {
 	}
 
 	if got, expected := ip, ipv6; got != expected {
-		t.Errorf("Droplet.PublicIPv6 returned %s; expected %s", got, expected)
+		t.Errorf("Server.PublicIPv6 returned %s; expected %s", got, expected)
 	}
 }

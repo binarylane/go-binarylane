@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"fmt"
@@ -16,10 +16,10 @@ func TestAccountGet(t *testing.T) {
 
 		response := `
 		{ "account": {
-			"droplet_limit": 25,
+			"server_limit": 25,
 			"floating_ip_limit": 25,
 			"volume_limit": 22,
-			"email": "sammy@digitalocean.com",
+			"email": "support@binarylane.com.au",
 			"uuid": "b6fr89dbf6d9156cace5f3c78dc9851d957381ef",
 			"email_verified": true
 			}
@@ -33,7 +33,7 @@ func TestAccountGet(t *testing.T) {
 		t.Errorf("Account.Get returned error: %v", err)
 	}
 
-	expected := &Account{DropletLimit: 25, FloatingIPLimit: 25, Email: "sammy@digitalocean.com",
+	expected := &Account{ServerLimit: 25, FloatingIPLimit: 25, Email: "support@binarylane.com.au",
 		UUID: "b6fr89dbf6d9156cace5f3c78dc9851d957381ef", EmailVerified: true, VolumeLimit: 22}
 	if !reflect.DeepEqual(acct, expected) {
 		t.Errorf("Account.Get returned %+v, expected %+v", acct, expected)
@@ -42,9 +42,9 @@ func TestAccountGet(t *testing.T) {
 
 func TestAccountString(t *testing.T) {
 	acct := &Account{
-		DropletLimit:    25,
+		ServerLimit:     25,
 		FloatingIPLimit: 25,
-		Email:           "sammy@digitalocean.com",
+		Email:           "support@binarylane.com.au",
 		UUID:            "b6fr89dbf6d9156cace5f3c78dc9851d957381ef",
 		EmailVerified:   true,
 		Status:          "active",
@@ -53,7 +53,7 @@ func TestAccountString(t *testing.T) {
 	}
 
 	stringified := acct.String()
-	expected := `godo.Account{DropletLimit:25, FloatingIPLimit:25, VolumeLimit:22, Email:"sammy@digitalocean.com", UUID:"b6fr89dbf6d9156cace5f3c78dc9851d957381ef", EmailVerified:true, Status:"active", StatusMessage:"message"}`
+	expected := `binarylane.Account{ServerLimit:25, FloatingIPLimit:25, VolumeLimit:22, Email:"support@binarylane.com.au", UUID:"b6fr89dbf6d9156cace5f3c78dc9851d957381ef", EmailVerified:true, Status:"active", StatusMessage:"message"}`
 	if expected != stringified {
 		t.Errorf("Account.String returned %+v, expected %+v", stringified, expected)
 	}

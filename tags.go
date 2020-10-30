@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"context"
@@ -9,8 +9,8 @@ import (
 const tagsBasePath = "v2/tags"
 
 // TagsService is an interface for interfacing with the tags
-// endpoints of the DigitalOcean API
-// See: https://developers.digitalocean.com/documentation/v2#tags
+// endpoints of the BinaryLane API
+// See: https://api.binarylane.com.au/reference#tags
 type TagsService interface {
 	List(context.Context, *ListOptions) ([]Tag, *Response, error)
 	Get(context.Context, string) (*Tag, *Response, error)
@@ -22,19 +22,19 @@ type TagsService interface {
 }
 
 // TagsServiceOp handles communication with tag related method of the
-// DigitalOcean API.
+// BinaryLane API.
 type TagsServiceOp struct {
 	client *Client
 }
 
 var _ TagsService = &TagsServiceOp{}
 
-// ResourceType represents a class of resource, currently only droplet are supported
+// ResourceType represents a class of resource, currently only server are supported
 type ResourceType string
 
 const (
-	// DropletResourceType holds the string representing our ResourceType of Droplet.
-	DropletResourceType ResourceType = "droplet"
+	// ServerResourceType holds the string representing our ResourceType of Server.
+	ServerResourceType ResourceType = "server"
 	// ImageResourceType holds the string representing our ResourceType of Image.
 	ImageResourceType ResourceType = "image"
 	// VolumeResourceType holds the string representing our ResourceType of Volume.
@@ -57,18 +57,18 @@ type Resource struct {
 type TaggedResources struct {
 	Count           int                             `json:"count"`
 	LastTaggedURI   string                          `json:"last_tagged_uri,omitempty"`
-	Droplets        *TaggedDropletsResources        `json:"droplets,omitempty"`
+	Servers         *TaggedServersResources         `json:"servers,omitempty"`
 	Images          *TaggedImagesResources          `json:"images"`
 	Volumes         *TaggedVolumesResources         `json:"volumes"`
 	VolumeSnapshots *TaggedVolumeSnapshotsResources `json:"volume_snapshots"`
 	Databases       *TaggedDatabasesResources       `json:"databases"`
 }
 
-// TaggedDropletsResources represent the droplet resources a tag is attached to
-type TaggedDropletsResources struct {
-	Count         int      `json:"count,float64,omitempty"`
-	LastTagged    *Droplet `json:"last_tagged,omitempty"`
-	LastTaggedURI string   `json:"last_tagged_uri,omitempty"`
+// TaggedServersResources represent the server resources a tag is attached to
+type TaggedServersResources struct {
+	Count         int     `json:"count,float64,omitempty"`
+	LastTagged    *Server `json:"last_tagged,omitempty"`
+	LastTaggedURI string  `json:"last_tagged_uri,omitempty"`
 }
 
 // TaggedResourcesData represent the generic resources a tag is attached to
@@ -89,7 +89,7 @@ type TaggedVolumeSnapshotsResources TaggedResourcesData
 // TaggedDatabasesResources represent the database resources a tag is attached to
 type TaggedDatabasesResources TaggedResourcesData
 
-// Tag represent DigitalOcean tag
+// Tag represent BinaryLane tag
 type Tag struct {
 	Name      string           `json:"name,omitempty"`
 	Resources *TaggedResources `json:"resources,omitempty"`

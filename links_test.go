@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"encoding/json"
@@ -9,35 +9,35 @@ var (
 	firstPageLinksJSONBlob = []byte(`{
 		"links": {
 			"pages": {
-				"last": "https://api.digitalocean.com/v2/droplets/?page=3",
-				"next": "https://api.digitalocean.com/v2/droplets/?page=2"
+				"last": "https://api.binarylane.com.au/v2/servers/?page=3",
+				"next": "https://api.binarylane.com.au/v2/servers/?page=2"
 			}
 		}
 	}`)
 	otherPageLinksJSONBlob = []byte(`{
 		"links": {
 			"pages": {
-				"first": "https://api.digitalocean.com/v2/droplets/?page=1",
-				"prev": "https://api.digitalocean.com/v2/droplets/?page=1",
-				"last": "https://api.digitalocean.com/v2/droplets/?page=3",
-				"next": "https://api.digitalocean.com/v2/droplets/?page=3"
+				"first": "https://api.binarylane.com.au/v2/servers/?page=1",
+				"prev": "https://api.binarylane.com.au/v2/servers/?page=1",
+				"last": "https://api.binarylane.com.au/v2/servers/?page=3",
+				"next": "https://api.binarylane.com.au/v2/servers/?page=3"
 			}
 		}
 	}`)
 	lastPageLinksJSONBlob = []byte(`{
 		"links": {
 			"pages": {
-				"first": "https://api.digitalocean.com/v2/droplets/?page=1",
-				"prev": "https://api.digitalocean.com/v2/droplets/?page=2"
+				"first": "https://api.binarylane.com.au/v2/servers/?page=1",
+				"prev": "https://api.binarylane.com.au/v2/servers/?page=2"
 			}
 		}
 	}`)
 	projectsLastPageLinksJSONBlob = []byte(`{
 		"links": {
 			"pages": {
-				"first": "https://api.digitalocean.com/v2/projects?page=1",
-				"prev": "https://api.digitalocean.com/v2/projects?page=2",
-				"last": "https://api.digitalocean.com/v2/projects?page=3"
+				"first": "https://api.binarylane.com.au/v2/projects?page=1",
+				"prev": "https://api.binarylane.com.au/v2/projects?page=2",
+				"last": "https://api.binarylane.com.au/v2/projects?page=3"
 			}
 		}
 	}`)
@@ -45,12 +45,12 @@ var (
 	missingLinksJSONBlob = []byte(`{ }`)
 )
 
-type godoList struct {
+type binarylaneList struct {
 	Links Links `json:"links"`
 }
 
 func loadLinksJSON(t *testing.T, j []byte) Links {
-	var list godoList
+	var list binarylaneList
 	err := json.Unmarshal(j, &list)
 	if err != nil {
 		t.Fatal(err)
@@ -137,17 +137,17 @@ func TestLinks_ParseURL(t *testing.T) {
 	linkTests := []linkTest{
 		{
 			name:     "prev",
-			url:      "https://api.digitalocean.com/v2/droplets/?page=1",
+			url:      "https://api.binarylane.com.au/v2/servers/?page=1",
 			expected: 1,
 		},
 		{
 			name:     "last",
-			url:      "https://api.digitalocean.com/v2/droplets/?page=5",
+			url:      "https://api.binarylane.com.au/v2/servers/?page=5",
 			expected: 5,
 		},
 		{
 			name:     "nexta",
-			url:      "https://api.digitalocean.com/v2/droplets/?page=2",
+			url:      "https://api.binarylane.com.au/v2/servers/?page=2",
 			expected: 2,
 		},
 	}

@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"context"
@@ -9,8 +9,8 @@ import (
 const imageBasePath = "v2/images"
 
 // ImagesService is an interface for interfacing with the images
-// endpoints of the DigitalOcean API
-// See: https://developers.digitalocean.com/documentation/v2#images
+// endpoints of the BinaryLane API
+// See: https://api.binarylane.com.au/reference#images
 type ImagesService interface {
 	List(context.Context, *ListOptions) ([]Image, *Response, error)
 	ListDistribution(ctx context.Context, opt *ListOptions) ([]Image, *Response, error)
@@ -25,14 +25,14 @@ type ImagesService interface {
 }
 
 // ImagesServiceOp handles communication with the image related methods of the
-// DigitalOcean API.
+// BinaryLane API.
 type ImagesServiceOp struct {
 	client *Client
 }
 
 var _ ImagesService = &ImagesServiceOp{}
 
-// Image represents a DigitalOcean Image
+// Image represents a BinaryLane Image
 type Image struct {
 	ID            int      `json:"id,float64,omitempty"`
 	Name          string   `json:"name,omitempty"`

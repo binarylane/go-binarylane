@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"context"
@@ -7,8 +7,8 @@ import (
 )
 
 // ImageActionsService is an interface for interfacing with the image actions
-// endpoints of the DigitalOcean API
-// See: https://developers.digitalocean.com/documentation/v2#image-actions
+// endpoints of the BinaryLane API
+// See: https://api.binarylane.com.au/reference#image-actions
 type ImageActionsService interface {
 	Get(context.Context, int, int) (*Action, *Response, error)
 	Transfer(context.Context, int, *ActionRequest) (*Action, *Response, error)
@@ -16,7 +16,7 @@ type ImageActionsService interface {
 }
 
 // ImageActionsServiceOp handles communition with the image action related methods of the
-// DigitalOcean API.
+// BinaryLane API.
 type ImageActionsServiceOp struct {
 	client *Client
 }

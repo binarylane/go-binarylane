@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"bytes"
@@ -19,9 +19,9 @@ import (
 )
 
 const (
-	libraryVersion = "1.50.0"
-	defaultBaseURL = "https://api.digitalocean.com/"
-	userAgent      = "godo/" + libraryVersion
+	libraryVersion = "0.1.0"
+	defaultBaseURL = "https://api.binarylane.com.au/"
+	userAgent      = "go-binarylane/" + libraryVersion
 	mediaType      = "application/json"
 
 	headerRateLimit     = "RateLimit-Limit"
@@ -29,9 +29,9 @@ const (
 	headerRateReset     = "RateLimit-Reset"
 )
 
-// Client manages communication with DigitalOcean V2 API.
+// Client manages communication with BinaryLane API.
 type Client struct {
-	// HTTP client used to communicate with the DO API.
+	// HTTP client used to communicate with the API.
 	client *http.Client
 
 	// Base URL for API requests.
@@ -48,13 +48,11 @@ type Client struct {
 	// Services used for communicating with the API
 	Account           AccountService
 	Actions           ActionsService
-	Apps              AppsService
 	Balance           BalanceService
 	BillingHistory    BillingHistoryService
-	CDNs              CDNService
 	Domains           DomainsService
-	Droplets          DropletsService
-	DropletActions    DropletActionsService
+	Servers           ServersService
+	ServerActions     ServerActionsService
 	Images            ImagesService
 	ImageActions      ImageActionsService
 	Invoices          InvoicesService
@@ -64,20 +62,13 @@ type Client struct {
 	FloatingIPs       FloatingIPsService
 	FloatingIPActions FloatingIPActionsService
 	Snapshots         SnapshotsService
-	Storage           StorageService
-	StorageActions    StorageActionsService
 	Tags              TagsService
 	LoadBalancers     LoadBalancersService
-	Certificates      CertificatesService
 	Firewalls         FirewallsService
 	Projects          ProjectsService
-	Kubernetes        KubernetesService
-	Registry          RegistryService
-	Databases         DatabasesService
 	VPCs              VPCsService
-	OneClick          OneClickService
 
-	// Optional function called after every successful request made to the DO APIs
+	// Optional function called after every successful request made to the API
 	onRequestCompleted RequestCompletionCallback
 }
 
@@ -94,7 +85,7 @@ type ListOptions struct {
 	PerPage int `url:"per_page,omitempty"`
 }
 
-// Response is a DigitalOcean response. This wraps the standard http.Response returned from DigitalOcean.
+// Response is a BinaryLane response. This wraps the standard http.Response returned from the API.
 type Response struct {
 	*http.Response
 
@@ -162,7 +153,7 @@ func addOptions(s string, opt interface{}) (string, error) {
 	return origURL.String(), nil
 }
 
-// NewFromToken returns a new DigitalOcean API client with the given API
+// NewFromToken returns a new BinaryLane API client with the given API
 // token.
 func NewFromToken(token string) *Client {
 	ctx := context.Background()
@@ -170,11 +161,11 @@ func NewFromToken(token string) *Client {
 	return NewClient(oauth2.NewClient(ctx, ts))
 }
 
-// NewClient returns a new DigitalOcean API client, using the given
+// NewClient returns a new BinaryLane API client, using the given
 // http.Client to perform all requests.
 //
 // Users who wish to pass their own http.Client should use this method. If
-// you're in need of further customization, the godo.New method allows more
+// you're in need of further customization, the binarylane.New method allows more
 // options, such as setting a custom URL or a custom user agent string.
 func NewClient(httpClient *http.Client) *Client {
 	if httpClient == nil {
@@ -186,14 +177,11 @@ func NewClient(httpClient *http.Client) *Client {
 	c := &Client{client: httpClient, BaseURL: baseURL, UserAgent: userAgent}
 	c.Account = &AccountServiceOp{client: c}
 	c.Actions = &ActionsServiceOp{client: c}
-	c.Apps = &AppsServiceOp{client: c}
 	c.Balance = &BalanceServiceOp{client: c}
 	c.BillingHistory = &BillingHistoryServiceOp{client: c}
-	c.CDNs = &CDNServiceOp{client: c}
-	c.Certificates = &CertificatesServiceOp{client: c}
 	c.Domains = &DomainsServiceOp{client: c}
-	c.Droplets = &DropletsServiceOp{client: c}
-	c.DropletActions = &DropletActionsServiceOp{client: c}
+	c.Servers = &ServersServiceOp{client: c}
+	c.ServerActions = &ServerActionsServiceOp{client: c}
 	c.Firewalls = &FirewallsServiceOp{client: c}
 	c.FloatingIPs = &FloatingIPsServiceOp{client: c}
 	c.FloatingIPActions = &FloatingIPActionsServiceOp{client: c}
@@ -206,14 +194,8 @@ func NewClient(httpClient *http.Client) *Client {
 	c.Regions = &RegionsServiceOp{client: c}
 	c.Sizes = &SizesServiceOp{client: c}
 	c.Snapshots = &SnapshotsServiceOp{client: c}
-	c.Storage = &StorageServiceOp{client: c}
-	c.StorageActions = &StorageActionsServiceOp{client: c}
 	c.Tags = &TagsServiceOp{client: c}
-	c.Kubernetes = &KubernetesServiceOp{client: c}
-	c.Registry = &RegistryServiceOp{client: c}
-	c.Databases = &DatabasesServiceOp{client: c}
 	c.VPCs = &VPCsServiceOp{client: c}
-	c.OneClick = &OneClickServiceOp{client: c}
 
 	return c
 }
@@ -221,7 +203,7 @@ func NewClient(httpClient *http.Client) *Client {
 // ClientOpt are options for New.
 type ClientOpt func(*Client) error
 
-// New returns a new DigitalOcean API client instance.
+// New returns a new BinaryLane API client instance.
 func New(httpClient *http.Client, opts ...ClientOpt) (*Client, error) {
 	c := NewClient(httpClient)
 	for _, opt := range opts {
@@ -282,7 +264,7 @@ func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body int
 	return req, nil
 }
 
-// OnRequestCompleted sets the DO API request completion callback
+// OnRequestCompleted sets the API request completion callback
 func (c *Client) OnRequestCompleted(rc RequestCompletionCallback) {
 	c.onRequestCompleted = rc
 }

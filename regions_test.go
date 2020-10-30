@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"fmt"
@@ -101,7 +101,7 @@ func TestRegion_String(t *testing.T) {
 	}
 
 	stringified := region.String()
-	expected := `godo.Region{Slug:"region", Name:"Region", Sizes:["1" "2"], Available:true}`
+	expected := `binarylane.Region{Slug:"region", Name:"Region", Sizes:["1" "2"], Available:true}`
 	if expected != stringified {
 		t.Errorf("Region.String returned %+v, expected %+v", stringified, expected)
 	}

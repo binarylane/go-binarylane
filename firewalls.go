@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"context"
@@ -9,36 +9,36 @@ import (
 
 const firewallsBasePath = "/v2/firewalls"
 
-// FirewallsService is an interface for managing Firewalls with the DigitalOcean API.
-// See: https://developers.digitalocean.com/documentation/v2/#firewalls
+// FirewallsService is an interface for managing Firewalls with the BinaryLane API.
+// See: https://api.binarylane.com.au/reference/#firewalls
 type FirewallsService interface {
 	Get(context.Context, string) (*Firewall, *Response, error)
 	Create(context.Context, *FirewallRequest) (*Firewall, *Response, error)
 	Update(context.Context, string, *FirewallRequest) (*Firewall, *Response, error)
 	Delete(context.Context, string) (*Response, error)
 	List(context.Context, *ListOptions) ([]Firewall, *Response, error)
-	ListByDroplet(context.Context, int, *ListOptions) ([]Firewall, *Response, error)
-	AddDroplets(context.Context, string, ...int) (*Response, error)
-	RemoveDroplets(context.Context, string, ...int) (*Response, error)
+	ListByServer(context.Context, int, *ListOptions) ([]Firewall, *Response, error)
+	AddServers(context.Context, string, ...int) (*Response, error)
+	RemoveServers(context.Context, string, ...int) (*Response, error)
 	AddTags(context.Context, string, ...string) (*Response, error)
 	RemoveTags(context.Context, string, ...string) (*Response, error)
 	AddRules(context.Context, string, *FirewallRulesRequest) (*Response, error)
 	RemoveRules(context.Context, string, *FirewallRulesRequest) (*Response, error)
 }
 
-// FirewallsServiceOp handles communication with Firewalls methods of the DigitalOcean API.
+// FirewallsServiceOp handles communication with Firewalls methods of the BinaryLane API.
 type FirewallsServiceOp struct {
 	client *Client
 }
 
-// Firewall represents a DigitalOcean Firewall configuration.
+// Firewall represents a BinaryLane Firewall configuration.
 type Firewall struct {
 	ID             string          `json:"id"`
 	Name           string          `json:"name"`
 	Status         string          `json:"status"`
 	InboundRules   []InboundRule   `json:"inbound_rules"`
 	OutboundRules  []OutboundRule  `json:"outbound_rules"`
-	DropletIDs     []int           `json:"droplet_ids"`
+	ServerIDs      []int           `json:"server_ids"`
 	Tags           []string        `json:"tags"`
 	Created        string          `json:"created_at"`
 	PendingChanges []PendingChange `json:"pending_changes"`
@@ -49,7 +49,7 @@ func (fw Firewall) String() string {
 	return Stringify(fw)
 }
 
-// URN returns the firewall name in a valid DO API URN form.
+// URN returns the firewall name in a valid BL API URN form.
 func (fw Firewall) URN() string {
 	return ToURN("Firewall", fw.ID)
 }
@@ -59,7 +59,7 @@ type FirewallRequest struct {
 	Name          string         `json:"name"`
 	InboundRules  []InboundRule  `json:"inbound_rules"`
 	OutboundRules []OutboundRule `json:"outbound_rules"`
-	DropletIDs    []int          `json:"droplet_ids"`
+	ServerIDs     []int          `json:"server_ids"`
 	Tags          []string       `json:"tags"`
 }
 
@@ -69,40 +69,40 @@ type FirewallRulesRequest struct {
 	OutboundRules []OutboundRule `json:"outbound_rules"`
 }
 
-// InboundRule represents a DigitalOcean Firewall inbound rule.
+// InboundRule represents a Firewall inbound rule.
 type InboundRule struct {
 	Protocol  string   `json:"protocol,omitempty"`
 	PortRange string   `json:"ports,omitempty"`
 	Sources   *Sources `json:"sources"`
 }
 
-// OutboundRule represents a DigitalOcean Firewall outbound rule.
+// OutboundRule represents a Firewall outbound rule.
 type OutboundRule struct {
 	Protocol     string        `json:"protocol,omitempty"`
 	PortRange    string        `json:"ports,omitempty"`
 	Destinations *Destinations `json:"destinations"`
 }
 
-// Sources represents a DigitalOcean Firewall InboundRule sources.
+// Sources represents Firewall InboundRule sources.
 type Sources struct {
 	Addresses        []string `json:"addresses,omitempty"`
 	Tags             []string `json:"tags,omitempty"`
-	DropletIDs       []int    `json:"droplet_ids,omitempty"`
+	ServerIDs        []int    `json:"server_ids,omitempty"`
 	LoadBalancerUIDs []string `json:"load_balancer_uids,omitempty"`
 }
 
-// PendingChange represents a DigitalOcean Firewall status details.
+// PendingChange represents Firewall status details.
 type PendingChange struct {
-	DropletID int    `json:"droplet_id,omitempty"`
-	Removing  bool   `json:"removing,omitempty"`
-	Status    string `json:"status,omitempty"`
+	ServerID int    `json:"server_id,omitempty"`
+	Removing bool   `json:"removing,omitempty"`
+	Status   string `json:"status,omitempty"`
 }
 
-// Destinations represents a DigitalOcean Firewall OutboundRule destinations.
+// Destinations represents Firewall OutboundRule destinations.
 type Destinations struct {
 	Addresses        []string `json:"addresses,omitempty"`
 	Tags             []string `json:"tags,omitempty"`
-	DropletIDs       []int    `json:"droplet_ids,omitempty"`
+	ServerIDs        []int    `json:"server_ids,omitempty"`
 	LoadBalancerUIDs []string `json:"load_balancer_uids,omitempty"`
 }
 
@@ -176,9 +176,9 @@ func (fw *FirewallsServiceOp) List(ctx context.Context, opt *ListOptions) ([]Fir
 	return fw.listHelper(ctx, path)
 }
 
-// ListByDroplet Firewalls.
-func (fw *FirewallsServiceOp) ListByDroplet(ctx context.Context, dID int, opt *ListOptions) ([]Firewall, *Response, error) {
-	basePath := path.Join(dropletBasePath, strconv.Itoa(dID), "firewalls")
+// ListByServer Firewalls.
+func (fw *FirewallsServiceOp) ListByServer(ctx context.Context, sID int, opt *ListOptions) ([]Firewall, *Response, error) {
+	basePath := path.Join(serverBasePath, strconv.Itoa(sID), "firewalls")
 	path, err := addOptions(basePath, opt)
 	if err != nil {
 		return nil, nil, err
@@ -187,16 +187,16 @@ func (fw *FirewallsServiceOp) ListByDroplet(ctx context.Context, dID int, opt *L
 	return fw.listHelper(ctx, path)
 }
 
-// AddDroplets to a Firewall.
-func (fw *FirewallsServiceOp) AddDroplets(ctx context.Context, fID string, dropletIDs ...int) (*Response, error) {
-	path := path.Join(firewallsBasePath, fID, "droplets")
-	return fw.createAndDoReq(ctx, http.MethodPost, path, &dropletsRequest{IDs: dropletIDs})
+// AddServers to a Firewall.
+func (fw *FirewallsServiceOp) AddServers(ctx context.Context, fID string, serverIDs ...int) (*Response, error) {
+	path := path.Join(firewallsBasePath, fID, "servers")
+	return fw.createAndDoReq(ctx, http.MethodPost, path, &serversRequest{IDs: serverIDs})
 }
 
-// RemoveDroplets from a Firewall.
-func (fw *FirewallsServiceOp) RemoveDroplets(ctx context.Context, fID string, dropletIDs ...int) (*Response, error) {
-	path := path.Join(firewallsBasePath, fID, "droplets")
-	return fw.createAndDoReq(ctx, http.MethodDelete, path, &dropletsRequest{IDs: dropletIDs})
+// RemoveServers from a Firewall.
+func (fw *FirewallsServiceOp) RemoveServers(ctx context.Context, fID string, serverIDs ...int) (*Response, error) {
+	path := path.Join(firewallsBasePath, fID, "servers")
+	return fw.createAndDoReq(ctx, http.MethodDelete, path, &serversRequest{IDs: serverIDs})
 }
 
 // AddTags to a Firewall.
@@ -223,8 +223,8 @@ func (fw *FirewallsServiceOp) RemoveRules(ctx context.Context, fID string, rr *F
 	return fw.createAndDoReq(ctx, http.MethodDelete, path, rr)
 }
 
-type dropletsRequest struct {
-	IDs []int `json:"droplet_ids"`
+type serversRequest struct {
+	IDs []int `json:"server_ids"`
 }
 
 type tagsRequest struct {

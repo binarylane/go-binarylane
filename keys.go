@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"context"
@@ -9,8 +9,8 @@ import (
 const keysBasePath = "v2/account/keys"
 
 // KeysService is an interface for interfacing with the keys
-// endpoints of the DigitalOcean API
-// See: https://developers.digitalocean.com/documentation/v2#keys
+// endpoints of the BinaryLane API
+// See: https://api.binarylane.com.au/reference#keys
 type KeysService interface {
 	List(context.Context, *ListOptions) ([]Key, *Response, error)
 	GetByID(context.Context, int) (*Key, *Response, error)
@@ -23,14 +23,14 @@ type KeysService interface {
 }
 
 // KeysServiceOp handles communication with key related method of the
-// DigitalOcean API.
+// BinaryLane API.
 type KeysServiceOp struct {
 	client *Client
 }
 
 var _ KeysService = &KeysServiceOp{}
 
-// Key represents a DigitalOcean Key.
+// Key represents a BinaryLane Key.
 type Key struct {
 	ID          int    `json:"id,float64,omitempty"`
 	Name        string `json:"name,omitempty"`
@@ -38,7 +38,7 @@ type Key struct {
 	PublicKey   string `json:"public_key,omitempty"`
 }
 
-// KeyUpdateRequest represents a request to update a DigitalOcean key.
+// KeyUpdateRequest represents a request to update a key.
 type KeyUpdateRequest struct {
 	Name string `json:"name"`
 }

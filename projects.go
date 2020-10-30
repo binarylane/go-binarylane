@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"context"
@@ -16,8 +16,8 @@ const (
 	projectsBasePath = "/v2/projects"
 )
 
-// ProjectsService is an interface for creating and managing Projects with the DigitalOcean API.
-// See: https://developers.digitalocean.com/documentation/v2/#projects
+// ProjectsService is an interface for creating and managing Projects with the BinaryLane API.
+// See: https://api.binarylane.com.au/reference/#projects
 type ProjectsService interface {
 	List(context.Context, *ListOptions) ([]Project, *Response, error)
 	GetDefault(context.Context) (*Project, *Response, error)
@@ -30,12 +30,12 @@ type ProjectsService interface {
 	AssignResources(context.Context, string, ...interface{}) ([]ProjectResource, *Response, error)
 }
 
-// ProjectsServiceOp handles communication with Projects methods of the DigitalOcean API.
+// ProjectsServiceOp handles communication with Projects methods of the BinaryLane API.
 type ProjectsServiceOp struct {
 	client *Client
 }
 
-// Project represents a DigitalOcean Project configuration.
+// Project represents a BinaryLane Project configuration.
 type Project struct {
 	ID          string `json:"id"`
 	OwnerUUID   string `json:"owner_uuid"`
@@ -252,8 +252,8 @@ func (p *ProjectsServiceOp) ListResources(ctx context.Context, projectID string,
 
 // AssignResources assigns one or more resources to a project. AssignResources
 // accepts resources in two possible formats:
-//  1. The resource type, like `&Droplet{ID: 1}` or `&FloatingIP{IP: "1.2.3.4"}`
-//  2. A valid DO URN as a string, like "do:droplet:1234"
+//  1. The resource type, like `&Server{ID: 1}` or `&FloatingIP{IP: "1.2.3.4"}`
+//  2. A valid BL URN as a string, like "bl:server:1234"
 //
 // There is no unassign. To move a resource to another project, just assign
 // it to that other project.

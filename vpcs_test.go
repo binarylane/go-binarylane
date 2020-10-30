@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"bytes"
@@ -14,8 +14,7 @@ import (
 )
 
 var vTestObj = &VPC{
-	ID:          "880b7f98-f062-404d-b33c-458d545696f6",
-	URN:         "do:vpc:880b7f98-f062-404d-b33c-458d545696f6",
+	ID:          1,
 	Name:        "my-new-vpc",
 	Description: "vpc description",
 	IPRange:     "10.122.0.0/20",
@@ -26,8 +25,7 @@ var vTestObj = &VPC{
 
 var vTestJSON = `
     {
-      "id":"880b7f98-f062-404d-b33c-458d545696f6",
-      "urn":"do:vpc:880b7f98-f062-404d-b33c-458d545696f6",
+      "id":1,
       "name":"my-new-vpc",
       "description":"vpc description",
       "ip_range":"10.122.0.0/20",
@@ -44,7 +42,7 @@ func TestVPCs_Get(t *testing.T) {
 	svc := client.VPCs
 	path := "/v2/vpcs"
 	want := vTestObj
-	id := "880b7f98-f062-404d-b33c-458d545696f6"
+	id := 1
 	jsonBlob := `
 {
   "vpc":
@@ -52,7 +50,7 @@ func TestVPCs_Get(t *testing.T) {
 }
 `
 
-	mux.HandleFunc(path+"/"+id, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("%s/%d", path, id), func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, jsonBlob)
 	})
@@ -145,7 +143,7 @@ func TestVPCs_Update(t *testing.T) {
 
 	tests := []struct {
 		desc                string
-		id                  string
+		id                  int
 		req                 *VPCUpdateRequest
 		mockResponse        string
 		expectedRequestBody string
@@ -153,7 +151,7 @@ func TestVPCs_Update(t *testing.T) {
 	}{
 		{
 			desc: "setting name and description without default argument",
-			id:   "880b7f98-f062-404d-b33c-458d545696f6",
+			id:   1,
 			req: &VPCUpdateRequest{
 				Name:        "my-new-vpc",
 				Description: "vpc description",
@@ -170,7 +168,7 @@ func TestVPCs_Update(t *testing.T) {
 
 		{
 			desc: "setting the default vpc option",
-			id:   "880b7f98-f062-404d-b33c-458d545696f6",
+			id:   1,
 			req: &VPCUpdateRequest{
 				Name:        "my-new-vpc",
 				Description: "vpc description",
@@ -188,7 +186,7 @@ func TestVPCs_Update(t *testing.T) {
 
 		{
 			desc: "setting the default vpc option",
-			id:   "880b7f98-f062-404d-b33c-458d545696f6",
+			id:   1,
 			req: &VPCUpdateRequest{
 				Name:        "my-new-vpc",
 				Description: "vpc description",
@@ -208,7 +206,7 @@ func TestVPCs_Update(t *testing.T) {
 	for _, tt := range tests {
 		setup()
 
-		mux.HandleFunc("/v2/vpcs/"+tt.id, func(w http.ResponseWriter, r *http.Request) {
+		mux.HandleFunc(fmt.Sprintf("/v2/vpcs/%d", tt.id), func(w http.ResponseWriter, r *http.Request) {
 			buf := new(bytes.Buffer)
 			buf.ReadFrom(r.Body)
 			require.Equal(t, tt.expectedRequestBody, strings.TrimSpace(buf.String()))
@@ -236,7 +234,7 @@ func TestVPCs_Set(t *testing.T) {
 
 	tests := []struct {
 		desc                string
-		id                  string
+		id                  int
 		updateFields        []VPCSetField
 		mockResponse        string
 		expectedRequestBody string
@@ -244,7 +242,7 @@ func TestVPCs_Set(t *testing.T) {
 	}{
 		{
 			desc: "setting name and description",
-			id:   "880b7f98-f062-404d-b33c-458d545696f6",
+			id:   1,
 			updateFields: []VPCSetField{
 				VPCSetName("my-new-vpc"),
 				VPCSetDescription("vpc description"),
@@ -261,7 +259,7 @@ func TestVPCs_Set(t *testing.T) {
 
 		{
 			desc: "setting the default vpc option",
-			id:   "880b7f98-f062-404d-b33c-458d545696f6",
+			id:   1,
 			updateFields: []VPCSetField{
 				VPCSetName("my-new-vpc"),
 				VPCSetDescription("vpc description"),
@@ -281,7 +279,7 @@ func TestVPCs_Set(t *testing.T) {
 	for _, tt := range tests {
 		setup()
 
-		mux.HandleFunc("/v2/vpcs/"+tt.id, func(w http.ResponseWriter, r *http.Request) {
+		mux.HandleFunc(fmt.Sprintf("/v2/vpcs/%d", tt.id), func(w http.ResponseWriter, r *http.Request) {
 			buf := new(bytes.Buffer)
 			buf.ReadFrom(r.Body)
 			require.Equal(t, tt.expectedRequestBody, strings.TrimSpace(buf.String()))
@@ -311,9 +309,9 @@ func TestVPCs_Delete(t *testing.T) {
 
 	svc := client.VPCs
 	path := "/v2/vpcs"
-	id := "880b7f98-f062-404d-b33c-458d545696f6"
+	id := 1
 
-	mux.HandleFunc(path+"/"+id, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("%s/%d", path, id), func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, http.MethodDelete)
 	})
 

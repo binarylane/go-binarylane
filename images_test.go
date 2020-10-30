@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"encoding/json"
@@ -413,7 +413,7 @@ func TestImage_String(t *testing.T) {
 	}
 
 	stringified := image.String()
-	expected := `godo.Image{ID:1, Name:"Image", Type:"snapshot", Distribution:"Ubuntu", Slug:"image", Public:true, Regions:["one" "two"], MinDiskSize:20, SizeGigaBytes:2.36, Created:"2013-11-27T09:24:55Z", Description:"", Status:"", ErrorMessage:""}`
+	expected := `binarylane.Image{ID:1, Name:"Image", Type:"snapshot", Distribution:"Ubuntu", Slug:"image", Public:true, Regions:["one" "two"], MinDiskSize:20, SizeGigaBytes:2.36, Created:"2013-11-27T09:24:55Z", Description:"", Status:"", ErrorMessage:""}`
 	if expected != stringified {
 		t.Errorf("Image.String returned %+v, expected %+v", stringified, expected)
 	}
