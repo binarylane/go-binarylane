@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"context"
@@ -77,10 +77,9 @@ func testClientServices(t *testing.T, c *Client) {
 		"Actions",
 		"Balance",
 		"BillingHistory",
-		"CDNs",
 		"Domains",
-		"Droplets",
-		"DropletActions",
+		"Servers",
+		"ServerActions",
 		"Images",
 		"ImageActions",
 		"Invoices",
@@ -143,7 +142,7 @@ func TestNewRequest(t *testing.T) {
 	c := NewClient(nil)
 
 	inURL, outURL := "/foo", defaultBaseURL+"foo"
-	inBody, outBody := &DropletCreateRequest{Name: "l"},
+	inBody, outBody := &ServerCreateRequest{Name: "l"},
 		`{"name":"l","region":"","size":"","image":0,`+
 			`"ssh_keys":null,"backups":false,"ipv6":false,`+
 			`"private_networking":false,"monitoring":false,"tags":null}`+"\n"
@@ -171,7 +170,7 @@ func TestNewRequest_withUserData(t *testing.T) {
 	c := NewClient(nil)
 
 	inURL, outURL := "/foo", defaultBaseURL+"foo"
-	inBody, outBody := &DropletCreateRequest{Name: "l", UserData: "u"},
+	inBody, outBody := &ServerCreateRequest{Name: "l", UserData: "u"},
 		`{"name":"l","region":"","size":"","image":0,`+
 			`"ssh_keys":null,"backups":false,"ipv6":false,`+
 			`"private_networking":false,"monitoring":false,"user_data":"u","tags":null}`+"\n"

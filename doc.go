@@ -1,2 +1,2 @@
-// Package godo is the DigtalOcean API v2 client for Go.
-package godo
+// Package binarylane is the BinaryLane API client for Go.
+package binarylane

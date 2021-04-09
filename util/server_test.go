@@ -5,7 +5,7 @@ import (
 
 	"golang.org/x/oauth2"
 
-	"github.com/digitalocean/godo"
+	"github.com/binarylane/go-binarylane"
 )
 
 func ExampleWaitForActive() {
@@ -16,10 +16,10 @@ func ExampleWaitForActive() {
 
 	ctx := context.TODO()
 	oauthClient := oauth2.NewClient(ctx, t)
-	client := godo.NewClient(oauthClient)
+	client := binarylane.NewClient(oauthClient)
 
-	// create your droplet and retrieve the create action uri
-	uri := "https://api.digitalocean.com/v2/actions/xxxxxxxx"
+	// create your server and retrieve the create action uri
+	uri := "https://api.binarylane.com.au/v2/actions/xxxxxxxx"
 
 	// block until until the action is complete
 	err := WaitForActive(ctx, client, uri)

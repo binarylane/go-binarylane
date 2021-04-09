@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"context"
@@ -9,25 +9,25 @@ import (
 const snapshotBasePath = "v2/snapshots"
 
 // SnapshotsService is an interface for interfacing with the snapshots
-// endpoints of the DigitalOcean API
-// See: https://developers.digitalocean.com/documentation/v2#snapshots
+// endpoints of the BinaryLane API
+// See: https://api.binarylane.com.au/reference#snapshots
 type SnapshotsService interface {
 	List(context.Context, *ListOptions) ([]Snapshot, *Response, error)
 	ListVolume(context.Context, *ListOptions) ([]Snapshot, *Response, error)
-	ListDroplet(context.Context, *ListOptions) ([]Snapshot, *Response, error)
+	ListServer(context.Context, *ListOptions) ([]Snapshot, *Response, error)
 	Get(context.Context, string) (*Snapshot, *Response, error)
 	Delete(context.Context, string) (*Response, error)
 }
 
 // SnapshotsServiceOp handles communication with the snapshot related methods of the
-// DigitalOcean API.
+// BinaryLane API.
 type SnapshotsServiceOp struct {
 	client *Client
 }
 
 var _ SnapshotsService = &SnapshotsServiceOp{}
 
-// Snapshot represents a DigitalOcean Snapshot
+// Snapshot represents a BinaryLane Snapshot
 type Snapshot struct {
 	ID            string   `json:"id,omitempty"`
 	Name          string   `json:"name,omitempty"`
@@ -63,9 +63,9 @@ func (s *SnapshotsServiceOp) List(ctx context.Context, opt *ListOptions) ([]Snap
 	return s.list(ctx, opt, nil)
 }
 
-// ListDroplet lists all the Droplet snapshots.
-func (s *SnapshotsServiceOp) ListDroplet(ctx context.Context, opt *ListOptions) ([]Snapshot, *Response, error) {
-	listOpt := listSnapshotOptions{ResourceType: "droplet"}
+// ListServer lists all the Server snapshots.
+func (s *SnapshotsServiceOp) ListServer(ctx context.Context, opt *ListOptions) ([]Snapshot, *Response, error) {
+	listOpt := listSnapshotOptions{ResourceType: "server"}
 	return s.list(ctx, opt, &listOpt)
 }
 

@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"encoding/json"
@@ -26,7 +26,7 @@ var (
 			"name": "testing-1",
 			"resources": {
 				"count": 0,
-				"droplets": {
+				"servers": {
 					"count": 0,
 					"last_tagged": null
 				},
@@ -48,7 +48,7 @@ var (
 			"name": "testing-2",
 			"resources": {
 				"count": 0,
-				"droplets": {
+				"servers": {
 					"count": 0,
 					"last_tagged": null
 				},
@@ -87,7 +87,7 @@ var (
 			"name": "testing-1",
 			"resources": {
 				"count": 0,
-				"droplets": {
+				"servers": {
 					"count": 0,
 					"last_tagged": null
 				},
@@ -114,10 +114,10 @@ var (
 			"name": "testing-1",
 			"resources": {
 				"count": 5,
-				"last_tagged_uri": "https://api.digitalocean.com/v2/droplets/1",
-				"droplets": {
+				"last_tagged_uri": "https://api.binarylane.com.au/v2/servers/1",
+				"servers": {
 					"count": 1,
-					"last_tagged_uri": "https://api.digitalocean.com/v2/droplets/1",
+					"last_tagged_uri": "https://api.binarylane.com.au/v2/servers/1",
 					"last_tagged": {
 						"id": 1,
 						"name": "test.example.com",
@@ -202,19 +202,19 @@ var (
 				},
 				"images": {
 					"count": 1,
-					"last_tagged_uri": "https://api.digitalocean.com/v2/images/1"
+					"last_tagged_uri": "https://api.binarylane.com.au/v2/images/1"
 				},
 				"volumes": {
 					"count": 1,
-					"last_tagged_uri": "https://api.digitalocean.com/v2/volumes/abc"
+					"last_tagged_uri": "https://api.binarylane.com.au/v2/volumes/abc"
 				},
 				"volume_snapshots": {
 					"count": 1,
-					"last_tagged_uri": "https://api.digitalocean.com/v2/snapshots/1"
+					"last_tagged_uri": "https://api.binarylane.com.au/v2/snapshots/1"
 				},
 				"databases": {
 					"count": 1,
-					"last_tagged_uri": "https://api.digitalocean.com/v2/databases/1"
+					"last_tagged_uri": "https://api.binarylane.com.au/v2/databases/1"
 				}
 			}
 		}
@@ -237,8 +237,8 @@ func TestTags_List(t *testing.T) {
 	}
 
 	expectedTags := []Tag{
-		{Name: "testing-1", Resources: &TaggedResources{Count: 0, Droplets: &TaggedDropletsResources{Count: 0, LastTagged: nil}, Images: &TaggedImagesResources{Count: 0}, Volumes: &TaggedVolumesResources{Count: 0}, VolumeSnapshots: &TaggedVolumeSnapshotsResources{Count: 0}, Databases: &TaggedDatabasesResources{Count: 0}}},
-		{Name: "testing-2", Resources: &TaggedResources{Count: 0, Droplets: &TaggedDropletsResources{Count: 0, LastTagged: nil}, Images: &TaggedImagesResources{Count: 0}, Volumes: &TaggedVolumesResources{Count: 0}, VolumeSnapshots: &TaggedVolumeSnapshotsResources{Count: 0}, Databases: &TaggedDatabasesResources{Count: 0}}},
+		{Name: "testing-1", Resources: &TaggedResources{Count: 0, Servers: &TaggedServersResources{Count: 0, LastTagged: nil}, Images: &TaggedImagesResources{Count: 0}, Volumes: &TaggedVolumesResources{Count: 0}, VolumeSnapshots: &TaggedVolumeSnapshotsResources{Count: 0}, Databases: &TaggedDatabasesResources{Count: 0}}},
+		{Name: "testing-2", Resources: &TaggedResources{Count: 0, Servers: &TaggedServersResources{Count: 0, LastTagged: nil}, Images: &TaggedImagesResources{Count: 0}, Volumes: &TaggedVolumesResources{Count: 0}, VolumeSnapshots: &TaggedVolumeSnapshotsResources{Count: 0}, Databases: &TaggedDatabasesResources{Count: 0}}},
 	}
 	if !reflect.DeepEqual(tags, expectedTags) {
 		t.Errorf("Tags.List returned tags %+v, expected %+v", tags, expectedTags)
@@ -314,18 +314,18 @@ func TestTags_Get(t *testing.T) {
 
 	assertStringTagEqual(t, tag.Name, "testing-1", fmt.Sprintf("Tags.Get return an incorrect name, got %+v, expected %+v", tag.Name, "testing-1"))
 	assertIntTagEqual(t, tag.Resources.Count, 5, fmt.Sprintf("Tags.Get return an incorrect resource count, got %+v, expected %+v", tag.Resources.Count, 5))
-	assertStringTagEqual(t, tag.Resources.LastTaggedURI, "https://api.digitalocean.com/v2/droplets/1", fmt.Sprintf("Tags.Get return an incorrect last tagged uri %+v, expected %+v", tag.Resources.LastTaggedURI, "https://api.digitalocean.com/v2/droplets/1"))
-	assertIntTagEqual(t, tag.Resources.Droplets.Count, 1, fmt.Sprintf("Tags.Get return an incorrect droplet resource count, got %+v, expected %+v", tag.Resources.Droplets.Count, 1))
-	assertIntTagEqual(t, tag.Resources.Droplets.LastTagged.ID, 1, fmt.Sprintf("Tags.Get return an incorrect last tagged droplet %+v, expected %+v", tag.Resources.Droplets.LastTagged.ID, 1))
-	assertStringTagEqual(t, tag.Resources.Droplets.LastTaggedURI, "https://api.digitalocean.com/v2/droplets/1", fmt.Sprintf("Tags.Get return an incorrect last tagged droplet uri %+v, expected %+v", tag.Resources.Droplets.LastTaggedURI, "https://api.digitalocean.com/v2/droplets/1"))
+	assertStringTagEqual(t, tag.Resources.LastTaggedURI, "https://api.binarylane.com.au/v2/servers/1", fmt.Sprintf("Tags.Get return an incorrect last tagged uri %+v, expected %+v", tag.Resources.LastTaggedURI, "https://api.binarylane.com.au/v2/servers/1"))
+	assertIntTagEqual(t, tag.Resources.Servers.Count, 1, fmt.Sprintf("Tags.Get return an incorrect server resource count, got %+v, expected %+v", tag.Resources.Servers.Count, 1))
+	assertIntTagEqual(t, tag.Resources.Servers.LastTagged.ID, 1, fmt.Sprintf("Tags.Get return an incorrect last tagged server %+v, expected %+v", tag.Resources.Servers.LastTagged.ID, 1))
+	assertStringTagEqual(t, tag.Resources.Servers.LastTaggedURI, "https://api.binarylane.com.au/v2/servers/1", fmt.Sprintf("Tags.Get return an incorrect last tagged server uri %+v, expected %+v", tag.Resources.Servers.LastTaggedURI, "https://api.binarylane.com.au/v2/servers/1"))
 	assertIntTagEqual(t, tag.Resources.Images.Count, 1, fmt.Sprintf("Tags.Get return an incorrect image resource count, got %+v, expected %+v", tag.Resources.Images.Count, 1))
-	assertStringTagEqual(t, tag.Resources.Images.LastTaggedURI, "https://api.digitalocean.com/v2/images/1", fmt.Sprintf("Tags.Get return an incorrect last tagged droplet uri %+v, expected %+v", tag.Resources.Images.LastTaggedURI, "https://api.digitalocean.com/v2/images/1"))
+	assertStringTagEqual(t, tag.Resources.Images.LastTaggedURI, "https://api.binarylane.com.au/v2/images/1", fmt.Sprintf("Tags.Get return an incorrect last tagged server uri %+v, expected %+v", tag.Resources.Images.LastTaggedURI, "https://api.binarylane.com.au/v2/images/1"))
 	assertIntTagEqual(t, tag.Resources.Volumes.Count, 1, fmt.Sprintf("Tags.Get return an incorrect volume resource count, got %+v, expected %+v", tag.Resources.Volumes.Count, 1))
-	assertStringTagEqual(t, tag.Resources.Volumes.LastTaggedURI, "https://api.digitalocean.com/v2/volumes/abc", fmt.Sprintf("Tags.Get return an incorrect last tagged volume uri %+v, expected %+v", tag.Resources.Volumes.LastTaggedURI, "https://api.digitalocean.com/v2/volumes/abc"))
+	assertStringTagEqual(t, tag.Resources.Volumes.LastTaggedURI, "https://api.binarylane.com.au/v2/volumes/abc", fmt.Sprintf("Tags.Get return an incorrect last tagged volume uri %+v, expected %+v", tag.Resources.Volumes.LastTaggedURI, "https://api.binarylane.com.au/v2/volumes/abc"))
 	assertIntTagEqual(t, tag.Resources.VolumeSnapshots.Count, 1, fmt.Sprintf("Tags.Get return an incorrect volume snapshot resource count, got %+v, expected %+v", tag.Resources.VolumeSnapshots.Count, 1))
-	assertStringTagEqual(t, tag.Resources.VolumeSnapshots.LastTaggedURI, "https://api.digitalocean.com/v2/snapshots/1", fmt.Sprintf("Tags.Get return an incorrect last tagged volume snapshot uri %+v, expected %+v", tag.Resources.VolumeSnapshots.LastTaggedURI, "https://api.digitalocean.com/v2/snapshots/1"))
+	assertStringTagEqual(t, tag.Resources.VolumeSnapshots.LastTaggedURI, "https://api.binarylane.com.au/v2/snapshots/1", fmt.Sprintf("Tags.Get return an incorrect last tagged volume snapshot uri %+v, expected %+v", tag.Resources.VolumeSnapshots.LastTaggedURI, "https://api.binarylane.com.au/v2/snapshots/1"))
 	assertIntTagEqual(t, tag.Resources.Databases.Count, 1, fmt.Sprintf("Tags.Get return an incorrect database resource count, got %+v, expected %+v", tag.Resources.Databases.Count, 1))
-	assertStringTagEqual(t, tag.Resources.Databases.LastTaggedURI, "https://api.digitalocean.com/v2/databases/1", fmt.Sprintf("Tags.Get return an incorrect last tagged database uri %+v, expected %+v", tag.Resources.Databases.LastTaggedURI, "https://api.digitalocean.com/v2/databases/1"))
+	assertStringTagEqual(t, tag.Resources.Databases.LastTaggedURI, "https://api.binarylane.com.au/v2/databases/1", fmt.Sprintf("Tags.Get return an incorrect last tagged database uri %+v, expected %+v", tag.Resources.Databases.LastTaggedURI, "https://api.binarylane.com.au/v2/databases/1"))
 
 }
 
@@ -361,7 +361,7 @@ func TestTags_Create(t *testing.T) {
 		Name: "testing-1",
 		Resources: &TaggedResources{
 			Count:           0,
-			Droplets:        &TaggedDropletsResources{Count: 0, LastTagged: nil},
+			Servers:         &TaggedServersResources{Count: 0, LastTagged: nil},
 			Images:          &TaggedImagesResources{Count: 0},
 			Volumes:         &TaggedVolumesResources{Count: 0},
 			VolumeSnapshots: &TaggedVolumeSnapshotsResources{Count: 0},
@@ -393,7 +393,7 @@ func TestTags_TagResource(t *testing.T) {
 
 	tagResourcesRequest := &TagResourcesRequest{
 		Resources: []Resource{
-			{ID: "1", Type: DropletResourceType},
+			{ID: "1", Type: ServerResourceType},
 			{ID: "1", Type: ImageResourceType},
 		},
 	}
@@ -425,7 +425,7 @@ func TestTags_UntagResource(t *testing.T) {
 
 	untagResourcesRequest := &UntagResourcesRequest{
 		Resources: []Resource{
-			{ID: "1", Type: DropletResourceType},
+			{ID: "1", Type: ServerResourceType},
 			{ID: "1", Type: ImageResourceType},
 		},
 	}

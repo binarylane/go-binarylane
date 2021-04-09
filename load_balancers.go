@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"context"
@@ -9,26 +9,26 @@ import (
 const loadBalancersBasePath = "/v2/load_balancers"
 const forwardingRulesPath = "forwarding_rules"
 
-const dropletsPath = "droplets"
+const serversPath = "servers"
 
-// LoadBalancersService is an interface for managing load balancers with the DigitalOcean API.
-// See: https://developers.digitalocean.com/documentation/v2#load-balancers
+// LoadBalancersService is an interface for managing load balancers with the BinaryLane API.
+// See: https://api.binarylane.com.au/reference#load-balancers
 type LoadBalancersService interface {
-	Get(context.Context, string) (*LoadBalancer, *Response, error)
+	Get(context.Context, int) (*LoadBalancer, *Response, error)
 	List(context.Context, *ListOptions) ([]LoadBalancer, *Response, error)
 	Create(context.Context, *LoadBalancerRequest) (*LoadBalancer, *Response, error)
-	Update(ctx context.Context, lbID string, lbr *LoadBalancerRequest) (*LoadBalancer, *Response, error)
-	Delete(ctx context.Context, lbID string) (*Response, error)
-	AddDroplets(ctx context.Context, lbID string, dropletIDs ...int) (*Response, error)
-	RemoveDroplets(ctx context.Context, lbID string, dropletIDs ...int) (*Response, error)
-	AddForwardingRules(ctx context.Context, lbID string, rules ...ForwardingRule) (*Response, error)
-	RemoveForwardingRules(ctx context.Context, lbID string, rules ...ForwardingRule) (*Response, error)
+	Update(ctx context.Context, lbID int, lbr *LoadBalancerRequest) (*LoadBalancer, *Response, error)
+	Delete(ctx context.Context, lbID int) (*Response, error)
+	AddServers(ctx context.Context, lbID int, serverIDs ...int) (*Response, error)
+	RemoveServers(ctx context.Context, lbID int, serverIDs ...int) (*Response, error)
+	AddForwardingRules(ctx context.Context, lbID int, rules ...ForwardingRule) (*Response, error)
+	RemoveForwardingRules(ctx context.Context, lbID int, rules ...ForwardingRule) (*Response, error)
 }
 
-// LoadBalancer represents a DigitalOcean load balancer configuration.
+// LoadBalancer represents a BinaryLane load balancer configuration.
 // Tags can only be provided upon the creation of a Load Balancer.
 type LoadBalancer struct {
-	ID                     string           `json:"id,omitempty"`
+	ID                     int              `json:"id,float64,omitempty"`
 	Name                   string           `json:"name,omitempty"`
 	IP                     string           `json:"ip,omitempty"`
 	SizeSlug               string           `json:"size,omitempty"`
@@ -39,13 +39,13 @@ type LoadBalancer struct {
 	HealthCheck            *HealthCheck     `json:"health_check,omitempty"`
 	StickySessions         *StickySessions  `json:"sticky_sessions,omitempty"`
 	Region                 *Region          `json:"region,omitempty"`
-	DropletIDs             []int            `json:"droplet_ids,omitempty"`
+	ServerIDs              []int            `json:"server_ids,omitempty"`
 	Tag                    string           `json:"tag,omitempty"`
 	Tags                   []string         `json:"tags,omitempty"`
 	RedirectHttpToHttps    bool             `json:"redirect_http_to_https,omitempty"`
 	EnableProxyProtocol    bool             `json:"enable_proxy_protocol,omitempty"`
 	EnableBackendKeepalive bool             `json:"enable_backend_keepalive,omitempty"`
-	VPCUUID                string           `json:"vpc_uuid,omitempty"`
+	VPCID                  int              `json:"vpc_id,float64,omitempty"`
 }
 
 // String creates a human-readable description of a LoadBalancer.
@@ -53,7 +53,7 @@ func (l LoadBalancer) String() string {
 	return Stringify(l)
 }
 
-// URN returns the load balancer ID in a valid DO API URN form.
+// URN returns the load balancer ID in a valid BL API URN form.
 func (l LoadBalancer) URN() string {
 	return ToURN("LoadBalancer", l.ID)
 }
@@ -66,13 +66,13 @@ func (l LoadBalancer) AsRequest() *LoadBalancerRequest {
 		Algorithm:              l.Algorithm,
 		SizeSlug:               l.SizeSlug,
 		ForwardingRules:        append([]ForwardingRule(nil), l.ForwardingRules...),
-		DropletIDs:             append([]int(nil), l.DropletIDs...),
+		ServerIDs:              append([]int(nil), l.ServerIDs...),
 		Tag:                    l.Tag,
 		RedirectHttpToHttps:    l.RedirectHttpToHttps,
 		EnableProxyProtocol:    l.EnableProxyProtocol,
 		EnableBackendKeepalive: l.EnableBackendKeepalive,
 		HealthCheck:            l.HealthCheck,
-		VPCUUID:                l.VPCUUID,
+		VPCID:                  l.VPCID,
 	}
 
 	if l.HealthCheck != nil {
@@ -141,13 +141,13 @@ type LoadBalancerRequest struct {
 	ForwardingRules        []ForwardingRule `json:"forwarding_rules,omitempty"`
 	HealthCheck            *HealthCheck     `json:"health_check,omitempty"`
 	StickySessions         *StickySessions  `json:"sticky_sessions,omitempty"`
-	DropletIDs             []int            `json:"droplet_ids,omitempty"`
+	ServerIDs              []int            `json:"server_ids,omitempty"`
 	Tag                    string           `json:"tag,omitempty"`
 	Tags                   []string         `json:"tags,omitempty"`
 	RedirectHttpToHttps    bool             `json:"redirect_http_to_https,omitempty"`
 	EnableProxyProtocol    bool             `json:"enable_proxy_protocol,omitempty"`
 	EnableBackendKeepalive bool             `json:"enable_backend_keepalive,omitempty"`
-	VPCUUID                string           `json:"vpc_uuid,omitempty"`
+	VPCID                  int              `json:"vpc_id,omitempty"`
 }
 
 // String creates a human-readable description of a LoadBalancerRequest.
@@ -163,11 +163,11 @@ func (l forwardingRulesRequest) String() string {
 	return Stringify(l)
 }
 
-type dropletIDsRequest struct {
-	IDs []int `json:"droplet_ids,omitempty"`
+type serverIDsRequest struct {
+	IDs []int `json:"server_ids,omitempty"`
 }
 
-func (l dropletIDsRequest) String() string {
+func (l serverIDsRequest) String() string {
 	return Stringify(l)
 }
 
@@ -181,7 +181,7 @@ type loadBalancerRoot struct {
 	LoadBalancer *LoadBalancer `json:"load_balancer"`
 }
 
-// LoadBalancersServiceOp handles communication with load balancer-related methods of the DigitalOcean API.
+// LoadBalancersServiceOp handles communication with load balancer-related methods of the BinaryLane API.
 type LoadBalancersServiceOp struct {
 	client *Client
 }
@@ -189,8 +189,8 @@ type LoadBalancersServiceOp struct {
 var _ LoadBalancersService = &LoadBalancersServiceOp{}
 
 // Get an existing load balancer by its identifier.
-func (l *LoadBalancersServiceOp) Get(ctx context.Context, lbID string) (*LoadBalancer, *Response, error) {
-	path := fmt.Sprintf("%s/%s", loadBalancersBasePath, lbID)
+func (l *LoadBalancersServiceOp) Get(ctx context.Context, lbID int) (*LoadBalancer, *Response, error) {
+	path := fmt.Sprintf("%s/%d", loadBalancersBasePath, lbID)
 
 	req, err := l.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
@@ -250,8 +250,8 @@ func (l *LoadBalancersServiceOp) Create(ctx context.Context, lbr *LoadBalancerRe
 }
 
 // Update an existing load balancer with new configuration.
-func (l *LoadBalancersServiceOp) Update(ctx context.Context, lbID string, lbr *LoadBalancerRequest) (*LoadBalancer, *Response, error) {
-	path := fmt.Sprintf("%s/%s", loadBalancersBasePath, lbID)
+func (l *LoadBalancersServiceOp) Update(ctx context.Context, lbID int, lbr *LoadBalancerRequest) (*LoadBalancer, *Response, error) {
+	path := fmt.Sprintf("%s/%d", loadBalancersBasePath, lbID)
 
 	req, err := l.client.NewRequest(ctx, "PUT", path, lbr)
 	if err != nil {
@@ -268,8 +268,8 @@ func (l *LoadBalancersServiceOp) Update(ctx context.Context, lbID string, lbr *L
 }
 
 // Delete a load balancer by its identifier.
-func (l *LoadBalancersServiceOp) Delete(ctx context.Context, ldID string) (*Response, error) {
-	path := fmt.Sprintf("%s/%s", loadBalancersBasePath, ldID)
+func (l *LoadBalancersServiceOp) Delete(ctx context.Context, ldID int) (*Response, error) {
+	path := fmt.Sprintf("%s/%d", loadBalancersBasePath, ldID)
 
 	req, err := l.client.NewRequest(ctx, http.MethodDelete, path, nil)
 	if err != nil {
@@ -279,11 +279,11 @@ func (l *LoadBalancersServiceOp) Delete(ctx context.Context, ldID string) (*Resp
 	return l.client.Do(ctx, req, nil)
 }
 
-// AddDroplets adds droplets to a load balancer.
-func (l *LoadBalancersServiceOp) AddDroplets(ctx context.Context, lbID string, dropletIDs ...int) (*Response, error) {
-	path := fmt.Sprintf("%s/%s/%s", loadBalancersBasePath, lbID, dropletsPath)
+// AddServers adds servers to a load balancer.
+func (l *LoadBalancersServiceOp) AddServers(ctx context.Context, lbID int, serverIDs ...int) (*Response, error) {
+	path := fmt.Sprintf("%s/%d/%s", loadBalancersBasePath, lbID, serversPath)
 
-	req, err := l.client.NewRequest(ctx, http.MethodPost, path, &dropletIDsRequest{IDs: dropletIDs})
+	req, err := l.client.NewRequest(ctx, http.MethodPost, path, &serverIDsRequest{IDs: serverIDs})
 	if err != nil {
 		return nil, err
 	}
@@ -291,11 +291,11 @@ func (l *LoadBalancersServiceOp) AddDroplets(ctx context.Context, lbID string, d
 	return l.client.Do(ctx, req, nil)
 }
 
-// RemoveDroplets removes droplets from a load balancer.
-func (l *LoadBalancersServiceOp) RemoveDroplets(ctx context.Context, lbID string, dropletIDs ...int) (*Response, error) {
-	path := fmt.Sprintf("%s/%s/%s", loadBalancersBasePath, lbID, dropletsPath)
+// RemoveServers removes servers from a load balancer.
+func (l *LoadBalancersServiceOp) RemoveServers(ctx context.Context, lbID int, serverIDs ...int) (*Response, error) {
+	path := fmt.Sprintf("%s/%d/%s", loadBalancersBasePath, lbID, serversPath)
 
-	req, err := l.client.NewRequest(ctx, http.MethodDelete, path, &dropletIDsRequest{IDs: dropletIDs})
+	req, err := l.client.NewRequest(ctx, http.MethodDelete, path, &serverIDsRequest{IDs: serverIDs})
 	if err != nil {
 		return nil, err
 	}
@@ -304,8 +304,8 @@ func (l *LoadBalancersServiceOp) RemoveDroplets(ctx context.Context, lbID string
 }
 
 // AddForwardingRules adds forwarding rules to a load balancer.
-func (l *LoadBalancersServiceOp) AddForwardingRules(ctx context.Context, lbID string, rules ...ForwardingRule) (*Response, error) {
-	path := fmt.Sprintf("%s/%s/%s", loadBalancersBasePath, lbID, forwardingRulesPath)
+func (l *LoadBalancersServiceOp) AddForwardingRules(ctx context.Context, lbID int, rules ...ForwardingRule) (*Response, error) {
+	path := fmt.Sprintf("%s/%d/%s", loadBalancersBasePath, lbID, forwardingRulesPath)
 
 	req, err := l.client.NewRequest(ctx, http.MethodPost, path, &forwardingRulesRequest{Rules: rules})
 	if err != nil {
@@ -316,8 +316,8 @@ func (l *LoadBalancersServiceOp) AddForwardingRules(ctx context.Context, lbID st
 }
 
 // RemoveForwardingRules removes forwarding rules from a load balancer.
-func (l *LoadBalancersServiceOp) RemoveForwardingRules(ctx context.Context, lbID string, rules ...ForwardingRule) (*Response, error) {
-	path := fmt.Sprintf("%s/%s/%s", loadBalancersBasePath, lbID, forwardingRulesPath)
+func (l *LoadBalancersServiceOp) RemoveForwardingRules(ctx context.Context, lbID int, rules ...ForwardingRule) (*Response, error) {
+	path := fmt.Sprintf("%s/%d/%s", loadBalancersBasePath, lbID, forwardingRulesPath)
 
 	req, err := l.client.NewRequest(ctx, http.MethodDelete, path, &forwardingRulesRequest{Rules: rules})
 	if err != nil {

@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"context"
@@ -17,14 +17,14 @@ const (
 )
 
 // ActionsService handles communction with action related methods of the
-// DigitalOcean API: https://developers.digitalocean.com/documentation/v2#actions
+// BinaryLane API: https://api.binarylane.com.au/reference#actions
 type ActionsService interface {
 	List(context.Context, *ListOptions) ([]Action, *Response, error)
 	Get(context.Context, int) (*Action, *Response, error)
 }
 
 // ActionsServiceOp handles communition with the image action related methods of the
-// DigitalOcean API.
+// BinaryLane API.
 type ActionsServiceOp struct {
 	client *Client
 }
@@ -41,7 +41,7 @@ type actionRoot struct {
 	Event *Action `json:"action"`
 }
 
-// Action represents a DigitalOcean Action
+// Action represents a BinaryLane Action
 type Action struct {
 	ID           int        `json:"id"`
 	Status       string     `json:"status"`

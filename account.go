@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"context"
@@ -6,23 +6,23 @@ import (
 )
 
 // AccountService is an interface for interfacing with the Account
-// endpoints of the DigitalOcean API
-// See: https://developers.digitalocean.com/documentation/v2/#account
+// endpoints of the BinaryLane API
+// See: https://api.binarylane.com.au/reference/#account
 type AccountService interface {
 	Get(context.Context) (*Account, *Response, error)
 }
 
 // AccountServiceOp handles communication with the Account related methods of
-// the DigitalOcean API.
+// the BinaryLane API.
 type AccountServiceOp struct {
 	client *Client
 }
 
 var _ AccountService = &AccountServiceOp{}
 
-// Account represents a DigitalOcean Account
+// Account represents a BinaryLane Account
 type Account struct {
-	DropletLimit    int    `json:"droplet_limit,omitempty"`
+	ServerLimit     int    `json:"server_limit,omitempty"`
 	FloatingIPLimit int    `json:"floating_ip_limit,omitempty"`
 	VolumeLimit     int    `json:"volume_limit,omitempty"`
 	Email           string `json:"email,omitempty"`
@@ -40,7 +40,7 @@ func (r Account) String() string {
 	return Stringify(r)
 }
 
-// Get DigitalOcean account info
+// Get account info
 func (s *AccountServiceOp) Get(ctx context.Context) (*Account, *Response, error) {
 
 	path := "v2/account"

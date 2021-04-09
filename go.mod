@@ -1,4 +1,4 @@
-module github.com/digitalocean/godo
+module github.com/binarylane/go-binarylane
 
 go 1.14
 

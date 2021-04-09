@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"fmt"
@@ -51,7 +51,7 @@ func TestAction_ListActionMultiplePages(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/v2/actions", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, `{"actions": [{"id":1},{"id":2}], "links":{"pages":{"next":"http://example.com/v2/droplets/?page=2"}}}`)
+		fmt.Fprint(w, `{"actions": [{"id":1},{"id":2}], "links":{"pages":{"next":"http://example.com/v2/servers/?page=2"}}}`)
 		testMethod(t, r, http.MethodGet)
 	})
 
@@ -145,8 +145,8 @@ func TestAction_String(t *testing.T) {
 	}
 
 	stringified := action.String()
-	expected := `godo.Action{ID:1, Status:"in-progress", Type:"transfer", ` +
-		`StartedAt:godo.Timestamp{2014-05-08 20:36:47 +0000 UTC}, ` +
+	expected := `binarylane.Action{ID:1, Status:"in-progress", Type:"transfer", ` +
+		`StartedAt:binarylane.Timestamp{2014-05-08 20:36:47 +0000 UTC}, ` +
 		`ResourceID:0, ResourceType:"", RegionSlug:""}`
 	if expected != stringified {
 		t.Errorf("Action.Stringify returned %+v, expected %+v", stringified, expected)

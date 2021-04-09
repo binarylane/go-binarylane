@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"context"
@@ -7,21 +7,21 @@ import (
 )
 
 // BalanceService is an interface for interfacing with the Balance
-// endpoints of the DigitalOcean API
-// See: https://developers.digitalocean.com/documentation/v2/#balance
+// endpoints of the BinaryLane API
+// See: https://api.binarylane.com.au/reference/#balance
 type BalanceService interface {
 	Get(context.Context) (*Balance, *Response, error)
 }
 
 // BalanceServiceOp handles communication with the Balance related methods of
-// the DigitalOcean API.
+// the BinaryLane API.
 type BalanceServiceOp struct {
 	client *Client
 }
 
 var _ BalanceService = &BalanceServiceOp{}
 
-// Balance represents a DigitalOcean Balance
+// Balance represents a BinaryLane Balance
 type Balance struct {
 	MonthToDateBalance string    `json:"month_to_date_balance"`
 	AccountBalance     string    `json:"account_balance"`
@@ -33,7 +33,7 @@ func (r Balance) String() string {
 	return Stringify(r)
 }
 
-// Get DigitalOcean balance info
+// Get balance info
 func (s *BalanceServiceOp) Get(ctx context.Context) (*Balance, *Response, error) {
 	path := "v2/customers/my/balance"
 

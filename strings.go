@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"bytes"
@@ -16,12 +16,12 @@ type ResourceWithURN interface {
 	URN() string
 }
 
-// ToURN converts the resource type and ID to a valid DO API URN.
+// ToURN converts the resource type and ID to a valid BL API URN.
 func ToURN(resourceType string, id interface{}) string {
-	return fmt.Sprintf("%s:%s:%v", "do", strings.ToLower(resourceType), id)
+	return fmt.Sprintf("%s:%s:%v", "bl", strings.ToLower(resourceType), id)
 }
 
-// Stringify attempts to create a string representation of DigitalOcean types
+// Stringify attempts to create a string representation of BinaryLane types
 func Stringify(message interface{}) string {
 	var buf bytes.Buffer
 	v := reflect.ValueOf(message)

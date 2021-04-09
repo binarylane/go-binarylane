@@ -1,7 +1,8 @@
-package godo
+package binarylane
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -9,20 +10,20 @@ import (
 const vpcsBasePath = "/v2/vpcs"
 
 // VPCsService is an interface for managing Virtual Private Cloud configurations with the
-// DigitalOcean API.
-// See: https://developers.digitalocean.com/documentation/v2#vpcs
+// BinaryLane API.
+// See: https://api.binarylane.com.au/reference#vpcs
 type VPCsService interface {
 	Create(context.Context, *VPCCreateRequest) (*VPC, *Response, error)
-	Get(context.Context, string) (*VPC, *Response, error)
+	Get(context.Context, int) (*VPC, *Response, error)
 	List(context.Context, *ListOptions) ([]*VPC, *Response, error)
-	Update(context.Context, string, *VPCUpdateRequest) (*VPC, *Response, error)
-	Set(context.Context, string, ...VPCSetField) (*VPC, *Response, error)
-	Delete(context.Context, string) (*Response, error)
+	Update(context.Context, int, *VPCUpdateRequest) (*VPC, *Response, error)
+	Set(context.Context, int, ...VPCSetField) (*VPC, *Response, error)
+	Delete(context.Context, int) (*Response, error)
 }
 
 var _ VPCsService = &VPCsServiceOp{}
 
-// VPCsServiceOp interfaces with VPC endpoints in the DigitalOcean API.
+// VPCsServiceOp interfaces with VPC endpoints in the BinaryLane API.
 type VPCsServiceOp struct {
 	client *Client
 }
@@ -65,10 +66,9 @@ func VPCSetDefault() VPCSetField {
 // vpcSetDefault satisfies the VPCSetField interface
 type vpcSetDefault struct{}
 
-// VPC represents a DigitalOcean Virtual Private Cloud configuration.
+// VPC represents a BinaryLane Virtual Private Cloud configuration.
 type VPC struct {
-	ID          string    `json:"id,omitempty"`
-	URN         string    `json:"urn"`
+	ID          int       `json:"id,,float64,omitempty"`
 	Name        string    `json:"name,omitempty"`
 	Description string    `json:"description,omitempty"`
 	IPRange     string    `json:"ip_range,omitempty"`
@@ -87,9 +87,13 @@ type vpcsRoot struct {
 	Meta  *Meta  `json:"meta"`
 }
 
+func (v VPC) URN() string {
+	return ToURN("VPC", v.ID)
+}
+
 // Get returns the details of a Virtual Private Cloud.
-func (v *VPCsServiceOp) Get(ctx context.Context, id string) (*VPC, *Response, error) {
-	path := vpcsBasePath + "/" + id
+func (v *VPCsServiceOp) Get(ctx context.Context, id int) (*VPC, *Response, error) {
+	path := fmt.Sprintf("%s/%d", vpcsBasePath, id)
 	req, err := v.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
@@ -148,8 +152,8 @@ func (v *VPCsServiceOp) List(ctx context.Context, opt *ListOptions) ([]*VPC, *Re
 }
 
 // Update updates a Virtual Private Cloud's properties.
-func (v *VPCsServiceOp) Update(ctx context.Context, id string, update *VPCUpdateRequest) (*VPC, *Response, error) {
-	path := vpcsBasePath + "/" + id
+func (v *VPCsServiceOp) Update(ctx context.Context, id int, update *VPCUpdateRequest) (*VPC, *Response, error) {
+	path := fmt.Sprintf("%s/%d", vpcsBasePath, id)
 	req, err := v.client.NewRequest(ctx, http.MethodPut, path, update)
 	if err != nil {
 		return nil, nil, err
@@ -177,8 +181,8 @@ func (*vpcSetDefault) vpcSetField(in map[string]interface{}) {
 }
 
 // Set updates specific properties of a Virtual Private Cloud.
-func (v *VPCsServiceOp) Set(ctx context.Context, id string, fields ...VPCSetField) (*VPC, *Response, error) {
-	path := vpcsBasePath + "/" + id
+func (v *VPCsServiceOp) Set(ctx context.Context, id int, fields ...VPCSetField) (*VPC, *Response, error) {
+	path := fmt.Sprintf("%s/%d", vpcsBasePath, id)
 	update := make(map[string]interface{}, len(fields))
 	for _, field := range fields {
 		field.vpcSetField(update)
@@ -200,8 +204,8 @@ func (v *VPCsServiceOp) Set(ctx context.Context, id string, fields ...VPCSetFiel
 
 // Delete deletes a Virtual Private Cloud. There is no way to recover a VPC once it has been
 // destroyed.
-func (v *VPCsServiceOp) Delete(ctx context.Context, id string) (*Response, error) {
-	path := vpcsBasePath + "/" + id
+func (v *VPCsServiceOp) Delete(ctx context.Context, id int) (*Response, error) {
+	path := fmt.Sprintf("%s/%d", vpcsBasePath, id)
 	req, err := v.client.NewRequest(ctx, http.MethodDelete, path, nil)
 	if err != nil {
 		return nil, err

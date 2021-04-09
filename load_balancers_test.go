@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"encoding/json"
@@ -13,7 +13,7 @@ var lbListJSONResponse = `
 {
 	"load_balancers":[
         {
-            "id":"37e6be88-01ec-4ec7-9bc6-a514d4719057",
+            "id":3,
             "name":"example-lb-01",
             "ip":"46.214.185.203",
             "algorithm":"round_robin",
@@ -62,7 +62,7 @@ var lbListJSONResponse = `
                 ],
                 "available":true
             },
-            "droplet_ids":[
+            "server_ids":[
                 2,
                 21
             ]
@@ -83,7 +83,7 @@ var lbListJSONResponse = `
 var lbCreateJSONResponse = `
 {
     "load_balancer":{
-        "id":"8268a81c-fcf5-423e-a337-bbfe95817f23",
+        "id":3,
         "name":"example-lb-01",
         "ip":"",
         "algorithm":"round_robin",
@@ -140,12 +140,12 @@ var lbCreateJSONResponse = `
             "available":true
 		},
 		"tags": ["my-tag"],
-        "droplet_ids":[
+        "server_ids":[
             2,
             21
         ],
         "redirect_http_to_https":true,
-        "vpc_uuid":"880b7f98-f062-404d-b33c-458d545696f6"
+        "vpc_id":2
     }
 }
 `
@@ -153,7 +153,7 @@ var lbCreateJSONResponse = `
 var lbGetJSONResponse = `
 {
     "load_balancer":{
-        "id":"37e6be88-01ec-4ec7-9bc6-a514d4719057",
+        "id":3,
         "name":"example-lb-01",
         "ip":"46.214.185.203",
         "algorithm":"round_robin",
@@ -202,7 +202,7 @@ var lbGetJSONResponse = `
             ],
             "available":true
         },
-        "droplet_ids":[
+        "server_ids":[
             2,
             21
         ]
@@ -213,7 +213,7 @@ var lbGetJSONResponse = `
 var lbUpdateJSONResponse = `
 {
     "load_balancer":{
-        "id":"8268a81c-fcf5-423e-a337-bbfe95817f23",
+        "id":3,
         "name":"example-lb-01",
         "ip":"12.34.56.78",
         "algorithm":"least_connections",
@@ -266,7 +266,7 @@ var lbUpdateJSONResponse = `
             ],
             "available":true
         },
-        "droplet_ids":[
+        "server_ids":[
             2,
             21
         ]
@@ -279,8 +279,8 @@ func TestLoadBalancers_Get(t *testing.T) {
 	defer teardown()
 
 	path := "/v2/load_balancers"
-	loadBalancerID := "37e6be88-01ec-4ec7-9bc6-a514d4719057"
-	path = fmt.Sprintf("%s/%s", path, loadBalancerID)
+	loadBalancerID := 3
+	path = fmt.Sprintf("%s/%d", path, loadBalancerID)
 	mux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, lbGetJSONResponse)
@@ -292,7 +292,7 @@ func TestLoadBalancers_Get(t *testing.T) {
 	}
 
 	expected := &LoadBalancer{
-		ID:        "37e6be88-01ec-4ec7-9bc6-a514d4719057",
+		ID:        3,
 		Name:      "example-lb-01",
 		IP:        "46.214.185.203",
 		Algorithm: "round_robin",
@@ -329,7 +329,7 @@ func TestLoadBalancers_Get(t *testing.T) {
 			Available: true,
 			Features:  []string{"private_networking", "backups", "ipv6", "metadata", "storage"},
 		},
-		DropletIDs: []int{2, 21},
+		ServerIDs: []int{2, 21},
 	}
 
 	assert.Equal(t, expected, loadBalancer)
@@ -368,9 +368,9 @@ func TestLoadBalancers_Create(t *testing.T) {
 		},
 		Tag:                 "my-tag",
 		Tags:                []string{"my-tag"},
-		DropletIDs:          []int{2, 21},
+		ServerIDs:           []int{2, 21},
 		RedirectHttpToHttps: true,
-		VPCUUID:             "880b7f98-f062-404d-b33c-458d545696f6",
+		VPCID:               2,
 	}
 
 	path := "/v2/load_balancers"
@@ -393,7 +393,7 @@ func TestLoadBalancers_Create(t *testing.T) {
 	}
 
 	expected := &LoadBalancer{
-		ID:        "8268a81c-fcf5-423e-a337-bbfe95817f23",
+		ID:        3,
 		Name:      "example-lb-01",
 		Algorithm: "round_robin",
 		Status:    "new",
@@ -438,9 +438,9 @@ func TestLoadBalancers_Create(t *testing.T) {
 			Features:  []string{"private_networking", "backups", "ipv6", "metadata", "storage"},
 		},
 		Tags:                []string{"my-tag"},
-		DropletIDs:          []int{2, 21},
+		ServerIDs:           []int{2, 21},
 		RedirectHttpToHttps: true,
-		VPCUUID:             "880b7f98-f062-404d-b33c-458d545696f6",
+		VPCID:               2,
 	}
 
 	assert.Equal(t, expected, loadBalancer)
@@ -481,12 +481,12 @@ func TestLoadBalancers_Update(t *testing.T) {
 		StickySessions: &StickySessions{
 			Type: "none",
 		},
-		DropletIDs: []int{2, 21},
+		ServerIDs: []int{2, 21},
 	}
 
 	path := "/v2/load_balancers"
-	loadBalancerID := "8268a81c-fcf5-423e-a337-bbfe95817f23"
-	path = fmt.Sprintf("%s/%s", path, loadBalancerID)
+	loadBalancerID := 3
+	path = fmt.Sprintf("%s/%d", path, loadBalancerID)
 
 	mux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
 		v := new(LoadBalancerRequest)
@@ -507,7 +507,7 @@ func TestLoadBalancers_Update(t *testing.T) {
 	}
 
 	expected := &LoadBalancer{
-		ID:        "8268a81c-fcf5-423e-a337-bbfe95817f23",
+		ID:        3,
 		Name:      "example-lb-01",
 		IP:        "12.34.56.78",
 		Algorithm: "least_connections",
@@ -547,7 +547,7 @@ func TestLoadBalancers_Update(t *testing.T) {
 			Available: true,
 			Features:  []string{"private_networking", "backups", "ipv6", "metadata", "storage"},
 		},
-		DropletIDs: []int{2, 21},
+		ServerIDs: []int{2, 21},
 	}
 
 	assert.Equal(t, expected, loadBalancer)
@@ -571,7 +571,7 @@ func TestLoadBalancers_List(t *testing.T) {
 
 	expectedLBs := []LoadBalancer{
 		{
-			ID:        "37e6be88-01ec-4ec7-9bc6-a514d4719057",
+			ID:        3,
 			Name:      "example-lb-01",
 			IP:        "46.214.185.203",
 			Algorithm: "round_robin",
@@ -607,7 +607,7 @@ func TestLoadBalancers_List(t *testing.T) {
 				Available: true,
 				Features:  []string{"private_networking", "backups", "ipv6", "metadata", "storage"},
 			},
-			DropletIDs: []int{2, 21},
+			ServerIDs: []int{2, 21},
 		},
 	}
 
@@ -643,9 +643,9 @@ func TestLoadBalancers_Delete(t *testing.T) {
 	setup()
 	defer teardown()
 
-	lbID := "37e6be88-01ec-4ec7-9bc6-a514d4719057"
+	lbID := 3
 	path := "/v2/load_balancers"
-	path = fmt.Sprintf("%s/%s", path, lbID)
+	path = fmt.Sprintf("%s/%d", path, lbID)
 	mux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, http.MethodDelete)
 	})
@@ -657,63 +657,63 @@ func TestLoadBalancers_Delete(t *testing.T) {
 	}
 }
 
-func TestLoadBalancers_AddDroplets(t *testing.T) {
+func TestLoadBalancers_AddServers(t *testing.T) {
 	setup()
 	defer teardown()
 
-	dropletIdsRequest := &dropletIDsRequest{
+	serverIdsRequest := &serverIDsRequest{
 		IDs: []int{42, 44},
 	}
 
-	lbID := "37e6be88-01ec-4ec7-9bc6-a514d4719057"
-	path := fmt.Sprintf("/v2/load_balancers/%s/droplets", lbID)
+	lbID := 3
+	path := fmt.Sprintf("/v2/load_balancers/%d/servers", lbID)
 	mux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
-		v := new(dropletIDsRequest)
+		v := new(serverIDsRequest)
 		err := json.NewDecoder(r.Body).Decode(v)
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		testMethod(t, r, http.MethodPost)
-		assert.Equal(t, dropletIdsRequest, v)
+		assert.Equal(t, serverIdsRequest, v)
 
 		fmt.Fprint(w, nil)
 	})
 
-	_, err := client.LoadBalancers.AddDroplets(ctx, lbID, dropletIdsRequest.IDs...)
+	_, err := client.LoadBalancers.AddServers(ctx, lbID, serverIdsRequest.IDs...)
 
 	if err != nil {
-		t.Errorf("LoadBalancers.AddDroplets returned error: %v", err)
+		t.Errorf("LoadBalancers.AddServers returned error: %v", err)
 	}
 }
 
-func TestLoadBalancers_RemoveDroplets(t *testing.T) {
+func TestLoadBalancers_RemoveServers(t *testing.T) {
 	setup()
 	defer teardown()
 
-	dropletIdsRequest := &dropletIDsRequest{
+	serverIdsRequest := &serverIDsRequest{
 		IDs: []int{2, 21},
 	}
 
-	lbID := "37e6be88-01ec-4ec7-9bc6-a514d4719057"
-	path := fmt.Sprintf("/v2/load_balancers/%s/droplets", lbID)
+	lbID := 3
+	path := fmt.Sprintf("/v2/load_balancers/%d/servers", lbID)
 	mux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
-		v := new(dropletIDsRequest)
+		v := new(serverIDsRequest)
 		err := json.NewDecoder(r.Body).Decode(v)
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		testMethod(t, r, http.MethodDelete)
-		assert.Equal(t, dropletIdsRequest, v)
+		assert.Equal(t, serverIdsRequest, v)
 
 		fmt.Fprint(w, nil)
 	})
 
-	_, err := client.LoadBalancers.RemoveDroplets(ctx, lbID, dropletIdsRequest.IDs...)
+	_, err := client.LoadBalancers.RemoveServers(ctx, lbID, serverIdsRequest.IDs...)
 
 	if err != nil {
-		t.Errorf("LoadBalancers.RemoveDroplets returned error: %v", err)
+		t.Errorf("LoadBalancers.RemoveServers returned error: %v", err)
 	}
 }
 
@@ -739,8 +739,8 @@ func TestLoadBalancers_AddForwardingRules(t *testing.T) {
 		},
 	}
 
-	lbID := "37e6be88-01ec-4ec7-9bc6-a514d4719057"
-	path := fmt.Sprintf("/v2/load_balancers/%s/forwarding_rules", lbID)
+	lbID := 3
+	path := fmt.Sprintf("/v2/load_balancers/%d/forwarding_rules", lbID)
 	mux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
 		v := new(forwardingRulesRequest)
 		err := json.NewDecoder(r.Body).Decode(v)
@@ -782,8 +782,8 @@ func TestLoadBalancers_RemoveForwardingRules(t *testing.T) {
 		},
 	}
 
-	lbID := "37e6be88-01ec-4ec7-9bc6-a514d4719057"
-	path := fmt.Sprintf("/v2/load_balancers/%s/forwarding_rules", lbID)
+	lbID := 3
+	path := fmt.Sprintf("/v2/load_balancers/%d/forwarding_rules", lbID)
 	mux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
 		v := new(forwardingRulesRequest)
 		err := json.NewDecoder(r.Body).Decode(v)
@@ -806,7 +806,7 @@ func TestLoadBalancers_RemoveForwardingRules(t *testing.T) {
 
 func TestLoadBalancers_AsRequest(t *testing.T) {
 	lb := &LoadBalancer{
-		ID:        "37e6be88-01ec-4ec7-9bc6-a514d4719057",
+		ID:        3,
 		Name:      "test-loadbalancer",
 		IP:        "10.0.0.1",
 		SizeSlug:  "lb-small",
@@ -833,10 +833,10 @@ func TestLoadBalancers_AsRequest(t *testing.T) {
 		RedirectHttpToHttps:    true,
 		EnableProxyProtocol:    true,
 		EnableBackendKeepalive: true,
-		VPCUUID:                "880b7f98-f062-404d-b33c-458d545696f6",
+		VPCID:                  2,
 	}
-	lb.DropletIDs = make([]int, 1, 2)
-	lb.DropletIDs[0] = 12345
+	lb.ServerIDs = make([]int, 1, 2)
+	lb.ServerIDs[0] = 12345
 	lb.ForwardingRules = make([]ForwardingRule, 1, 2)
 	lb.ForwardingRules[0] = ForwardingRule{
 		EntryProtocol:  "http",
@@ -870,11 +870,11 @@ func TestLoadBalancers_AsRequest(t *testing.T) {
 			CookieName:       "nomnom",
 			CookieTtlSeconds: 32,
 		},
-		DropletIDs:             []int{12345},
+		ServerIDs:              []int{12345},
 		RedirectHttpToHttps:    true,
 		EnableProxyProtocol:    true,
 		EnableBackendKeepalive: true,
-		VPCUUID:                "880b7f98-f062-404d-b33c-458d545696f6",
+		VPCID:                  2,
 	}
 
 	r := lb.AsRequest()
@@ -882,7 +882,7 @@ func TestLoadBalancers_AsRequest(t *testing.T) {
 	assert.False(t, r.HealthCheck == lb.HealthCheck, "HealthCheck points to same struct")
 	assert.False(t, r.StickySessions == lb.StickySessions, "StickySessions points to same struct")
 
-	r.DropletIDs = append(r.DropletIDs, 54321)
+	r.ServerIDs = append(r.ServerIDs, 54321)
 	r.ForwardingRules = append(r.ForwardingRules, ForwardingRule{
 		EntryProtocol:  "https",
 		EntryPort:      443,
@@ -892,14 +892,14 @@ func TestLoadBalancers_AsRequest(t *testing.T) {
 	})
 
 	// Check that original LoadBalancer hasn't changed
-	lb.DropletIDs = append(lb.DropletIDs, 13579)
+	lb.ServerIDs = append(lb.ServerIDs, 13579)
 	lb.ForwardingRules = append(lb.ForwardingRules, ForwardingRule{
 		EntryProtocol:  "tcp",
 		EntryPort:      587,
 		TargetProtocol: "tcp",
 		TargetPort:     587,
 	})
-	assert.Equal(t, []int{12345, 54321}, r.DropletIDs)
+	assert.Equal(t, []int{12345, 54321}, r.ServerIDs)
 	assert.Equal(t, []ForwardingRule{
 		{
 			EntryProtocol:  "http",

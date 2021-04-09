@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"context"
@@ -6,21 +6,21 @@ import (
 )
 
 // RegionsService is an interface for interfacing with the regions
-// endpoints of the DigitalOcean API
-// See: https://developers.digitalocean.com/documentation/v2#regions
+// endpoints of the BinaryLane API
+// See: https://api.binarylane.com.au/reference#regions
 type RegionsService interface {
 	List(context.Context, *ListOptions) ([]Region, *Response, error)
 }
 
 // RegionsServiceOp handles communication with the region related methods of the
-// DigitalOcean API.
+// BinaryLane API.
 type RegionsServiceOp struct {
 	client *Client
 }
 
 var _ RegionsService = &RegionsServiceOp{}
 
-// Region represents a DigitalOcean Region
+// Region represents a BinaryLane Region
 type Region struct {
 	Slug      string   `json:"slug,omitempty"`
 	Name      string   `json:"name,omitempty"`

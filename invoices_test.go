@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"bytes"
@@ -18,11 +18,11 @@ func TestInvoices_GetInvoices(t *testing.T) {
 		fmt.Fprint(w, `{
 			"invoice_items": [
 				{
-					"product": "Droplets",
+					"product": "Servers",
 					"resource_id": "1234",
-					"resource_uuid": "droplet-1234-uuid",
+					"resource_uuid": "server-1234-uuid",
 					"group_description": "",
-					"description": "My Example Droplet",
+					"description": "My Example Server",
 					"amount": "12.34",
 					"duration": "672",
 					"duration_unit": "Hours",
@@ -59,11 +59,11 @@ func TestInvoices_GetInvoices(t *testing.T) {
 
 	expectedInvoiceItems := []InvoiceItem{
 		{
-			Product:          "Droplets",
+			Product:          "Servers",
 			ResourceID:       "1234",
-			ResourceUUID:     "droplet-1234-uuid",
+			ResourceUUID:     "server-1234-uuid",
 			GroupDescription: "",
-			Description:      "My Example Droplet",
+			Description:      "My Example Server",
 			Amount:           "12.34",
 			Duration:         "672",
 			DurationUnit:     "Hours",
@@ -186,7 +186,7 @@ func TestInvoices_GetSummary(t *testing.T) {
 				"created_at": "2018-06-20T08:44:38Z",
 				"updated_at": "2018-06-21T08:44:38Z"
 			},
-			"user_company": "DigitalOcean",
+			"user_company": "BinaryLane",
 			"user_email": "fbaggins@example.com",
 			"product_charges": {
 				"name": "Product usage charges",
@@ -239,7 +239,7 @@ func TestInvoices_GetSummary(t *testing.T) {
 			CreatedAt:       time.Date(2018, 6, 20, 8, 44, 38, 0, time.UTC),
 			UpdatedAt:       time.Date(2018, 6, 21, 8, 44, 38, 0, time.UTC),
 		},
-		UserCompany: "DigitalOcean",
+		UserCompany: "BinaryLane",
 		UserEmail:   "fbaggins@example.com",
 		ProductCharges: InvoiceSummaryBreakdown{
 			Name:   "Product usage charges",

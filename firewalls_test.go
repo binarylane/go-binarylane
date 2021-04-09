@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"encoding/json"
@@ -19,7 +19,7 @@ var (
       "sources": {
         "addresses": ["0.0.0.0/0"],
         "tags": ["frontend"],
-        "droplet_ids": [123, 456],
+        "server_ids": [123, 456],
         "load_balancer_uids": ["lb-uid"]
       }
     },
@@ -46,7 +46,7 @@ var (
       }
     }
   ],
-  "droplet_ids": [123],
+  "server_ids": [123],
   "tags": ["frontend"]
 }
 `
@@ -84,7 +84,7 @@ var (
       }
     }
   ],
-  "droplet_ids": [123],
+  "server_ids": [123],
   "tags": []
 }
 `
@@ -104,7 +104,7 @@ var (
     ],
     "outbound_rules": [],
     "created_at": "2017-04-06T13:07:27Z",
-    "droplet_ids": [
+    "server_ids": [
       123
     ],
     "tags": []
@@ -147,7 +147,7 @@ var (
       }
     ],
     "created_at": "2017-04-06T13:07:27Z",
-    "droplet_ids": [
+    "server_ids": [
       123
     ],
     "tags": [
@@ -155,7 +155,7 @@ var (
     ],
     "pending_changes": [
       {
-        "droplet_id": 123,
+        "server_id": 123,
         "removing": false,
         "status": "waiting"
       }
@@ -199,7 +199,7 @@ var (
         }
       ],
       "created_at": "2017-04-06T13:07:27Z",
-      "droplet_ids": [
+      "server_ids": [
         123
       ],
       "tags": [
@@ -266,14 +266,14 @@ func TestFirewalls_Get(t *testing.T) {
 				},
 			},
 		},
-		Created:    "2017-04-06T13:07:27Z",
-		DropletIDs: []int{123},
-		Tags:       []string{"frontend"},
+		Created:   "2017-04-06T13:07:27Z",
+		ServerIDs: []int{123},
+		Tags:      []string{"frontend"},
 		PendingChanges: []PendingChange{
 			{
-				DropletID: 123,
-				Removing:  false,
-				Status:    "waiting",
+				ServerID: 123,
+				Removing: false,
+				Status:   "waiting",
 			},
 		},
 	}
@@ -295,7 +295,7 @@ func TestFirewalls_Create(t *testing.T) {
 				Sources: &Sources{
 					Addresses:        []string{"0.0.0.0/0"},
 					Tags:             []string{"frontend"},
-					DropletIDs:       []int{123, 456},
+					ServerIDs:        []int{123, 456},
 					LoadBalancerUIDs: []string{"lb-uid"},
 				},
 			},
@@ -322,8 +322,8 @@ func TestFirewalls_Create(t *testing.T) {
 				},
 			},
 		},
-		DropletIDs: []int{123},
-		Tags:       []string{"frontend"},
+		ServerIDs: []int{123},
+		Tags:      []string{"frontend"},
 	}
 
 	mux.HandleFunc("/v2/firewalls", func(w http.ResponseWriter, r *http.Request) {
@@ -385,14 +385,14 @@ func TestFirewalls_Create(t *testing.T) {
 				},
 			},
 		},
-		Created:    "2017-04-06T13:07:27Z",
-		DropletIDs: []int{123},
-		Tags:       []string{"frontend"},
+		Created:   "2017-04-06T13:07:27Z",
+		ServerIDs: []int{123},
+		Tags:      []string{"frontend"},
 		PendingChanges: []PendingChange{
 			{
-				DropletID: 123,
-				Removing:  false,
-				Status:    "waiting",
+				ServerID: 123,
+				Removing: false,
+				Status:   "waiting",
 			},
 		},
 	}
@@ -417,8 +417,8 @@ func TestFirewalls_Update(t *testing.T) {
 				},
 			},
 		},
-		DropletIDs: []int{123},
-		Tags:       []string{},
+		ServerIDs: []int{123},
+		Tags:      []string{},
 	}
 
 	urlStr := "/v2/firewalls"
@@ -464,7 +464,7 @@ func TestFirewalls_Update(t *testing.T) {
 		},
 		OutboundRules: []OutboundRule{},
 		Created:       "2017-04-06T13:07:27Z",
-		DropletIDs:    []int{123},
+		ServerIDs:     []int{123},
 		Tags:          []string{},
 	}
 
@@ -516,16 +516,16 @@ func TestFirewalls_List(t *testing.T) {
 	}
 }
 
-func TestFirewalls_ListByDroplet(t *testing.T) {
+func TestFirewalls_ListByServer(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/droplets/123/firewalls", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/servers/123/firewalls", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, http.MethodGet)
 		fmt.Fprint(w, firewallListJSONResponse)
 	})
 
-	actualFirewalls, resp, err := client.Firewalls.ListByDroplet(ctx, 123, nil)
+	actualFirewalls, resp, err := client.Firewalls.ListByServer(ctx, 123, nil)
 
 	if err != nil {
 		t.Errorf("Firewalls.List returned error: %v", err)
@@ -541,18 +541,18 @@ func TestFirewalls_ListByDroplet(t *testing.T) {
 	}
 }
 
-func TestFirewalls_AddDroplets(t *testing.T) {
+func TestFirewalls_AddServers(t *testing.T) {
 	setup()
 	defer teardown()
 
-	dRequest := &dropletsRequest{
+	dRequest := &serversRequest{
 		IDs: []int{123},
 	}
 
 	fID := "fe6b88f2-b42b-4bf7-bbd3-5ae20208f0b0"
-	urlStr := path.Join("/v2/firewalls", fID, "droplets")
+	urlStr := path.Join("/v2/firewalls", fID, "servers")
 	mux.HandleFunc(urlStr, func(w http.ResponseWriter, r *http.Request) {
-		v := new(dropletsRequest)
+		v := new(serversRequest)
 		err := json.NewDecoder(r.Body).Decode(v)
 		if err != nil {
 			t.Fatal(err)
@@ -563,35 +563,35 @@ func TestFirewalls_AddDroplets(t *testing.T) {
 			t.Errorf("Request body = %+v, expected %+v", v, dRequest)
 		}
 
-		expectedJSONBody := `{"droplet_ids": [123]}`
-		var actualDropletsRequest *dropletsRequest
-		json.Unmarshal([]byte(expectedJSONBody), &actualDropletsRequest)
-		if !reflect.DeepEqual(actualDropletsRequest, dRequest) {
-			t.Errorf("Request body = %+v, expected %+v", actualDropletsRequest, dRequest)
+		expectedJSONBody := `{"server_ids": [123]}`
+		var actualServersRequest *serversRequest
+		json.Unmarshal([]byte(expectedJSONBody), &actualServersRequest)
+		if !reflect.DeepEqual(actualServersRequest, dRequest) {
+			t.Errorf("Request body = %+v, expected %+v", actualServersRequest, dRequest)
 		}
 
 		fmt.Fprint(w, nil)
 	})
 
-	_, err := client.Firewalls.AddDroplets(ctx, fID, dRequest.IDs...)
+	_, err := client.Firewalls.AddServers(ctx, fID, dRequest.IDs...)
 
 	if err != nil {
-		t.Errorf("Firewalls.AddDroplets returned error: %v", err)
+		t.Errorf("Firewalls.AddServers returned error: %v", err)
 	}
 }
 
-func TestFirewalls_RemoveDroplets(t *testing.T) {
+func TestFirewalls_RemoveServers(t *testing.T) {
 	setup()
 	defer teardown()
 
-	dRequest := &dropletsRequest{
+	dRequest := &serversRequest{
 		IDs: []int{123, 345},
 	}
 
 	fID := "fe6b88f2-b42b-4bf7-bbd3-5ae20208f0b0"
-	urlStr := path.Join("/v2/firewalls", fID, "droplets")
+	urlStr := path.Join("/v2/firewalls", fID, "servers")
 	mux.HandleFunc(urlStr, func(w http.ResponseWriter, r *http.Request) {
-		v := new(dropletsRequest)
+		v := new(serversRequest)
 		err := json.NewDecoder(r.Body).Decode(v)
 		if err != nil {
 			t.Fatal(err)
@@ -602,20 +602,20 @@ func TestFirewalls_RemoveDroplets(t *testing.T) {
 			t.Errorf("Request body = %+v, expected %+v", v, dRequest)
 		}
 
-		expectedJSONBody := `{"droplet_ids": [123, 345]}`
-		var actualDropletsRequest *dropletsRequest
-		json.Unmarshal([]byte(expectedJSONBody), &actualDropletsRequest)
-		if !reflect.DeepEqual(actualDropletsRequest, dRequest) {
-			t.Errorf("Request body = %+v, expected %+v", actualDropletsRequest, dRequest)
+		expectedJSONBody := `{"server_ids": [123, 345]}`
+		var actualServersRequest *serversRequest
+		json.Unmarshal([]byte(expectedJSONBody), &actualServersRequest)
+		if !reflect.DeepEqual(actualServersRequest, dRequest) {
+			t.Errorf("Request body = %+v, expected %+v", actualServersRequest, dRequest)
 		}
 
 		fmt.Fprint(w, nil)
 	})
 
-	_, err := client.Firewalls.RemoveDroplets(ctx, fID, dRequest.IDs...)
+	_, err := client.Firewalls.RemoveServers(ctx, fID, dRequest.IDs...)
 
 	if err != nil {
-		t.Errorf("Firewalls.RemoveDroplets returned error: %v", err)
+		t.Errorf("Firewalls.RemoveServers returned error: %v", err)
 	}
 }
 
@@ -839,9 +839,9 @@ func makeExpectedFirewalls() []Firewall {
 					},
 				},
 			},
-			DropletIDs: []int{123},
-			Tags:       []string{"frontend"},
-			Created:    "2017-04-06T13:07:27Z",
+			ServerIDs: []int{123},
+			Tags:      []string{"frontend"},
+			Created:   "2017-04-06T13:07:27Z",
 		},
 	}
 }

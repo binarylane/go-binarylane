@@ -1,8 +1,8 @@
-package godo
+package binarylane
 
 import "fmt"
 
-// ArgError is an error that represents an error with an input to godo. It
+// ArgError is an error that represents an error with an input. It
 // identifies the argument and the cause (if possible).
 type ArgError struct {
 	arg    string

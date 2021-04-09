@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"encoding/json"
@@ -11,10 +11,10 @@ import (
 func TestFloatingIPsActions_Assign(t *testing.T) {
 	setup()
 	defer teardown()
-	dropletID := 12345
+	serverID := 12345
 	assignRequest := &ActionRequest{
-		"droplet_id": float64(dropletID), // encoding/json decodes numbers as floats
-		"type":       "assign",
+		"server_id": float64(serverID), // encoding/json decodes numbers as floats
+		"type":      "assign",
 	}
 
 	mux.HandleFunc("/v2/floating_ips/192.168.0.1/actions", func(w http.ResponseWriter, r *http.Request) {

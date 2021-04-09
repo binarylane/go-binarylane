@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/digitalocean/godo"
+	"github.com/binarylane/go-binarylane"
 )
 
 const (
@@ -15,8 +15,8 @@ const (
 	activeFailure = 3
 )
 
-// WaitForActive waits for a droplet to become active
-func WaitForActive(ctx context.Context, client *godo.Client, monitorURI string) error {
+// WaitForActive waits for a server to become active
+func WaitForActive(ctx context.Context, client *binarylane.Client, monitorURI string) error {
 	if len(monitorURI) == 0 {
 		return fmt.Errorf("create had no monitor uri")
 	}
@@ -24,7 +24,7 @@ func WaitForActive(ctx context.Context, client *godo.Client, monitorURI string) 
 	completed := false
 	failCount := 0
 	for !completed {
-		action, _, err := client.DropletActions.GetByURI(ctx, monitorURI)
+		action, _, err := client.ServerActions.GetByURI(ctx, monitorURI)
 
 		if err != nil {
 			select {
@@ -40,13 +40,13 @@ func WaitForActive(ctx context.Context, client *godo.Client, monitorURI string) 
 		}
 
 		switch action.Status {
-		case godo.ActionInProgress:
+		case binarylane.ActionInProgress:
 			select {
 			case <-time.After(5 * time.Second):
 			case <-ctx.Done():
 				return err
 			}
-		case godo.ActionCompleted:
+		case binarylane.ActionCompleted:
 			completed = true
 		default:
 			return fmt.Errorf("unknown status: [%s]", action.Status)

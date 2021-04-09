@@ -1,4 +1,4 @@
-package godo
+package binarylane
 
 import (
 	"encoding/json"
@@ -51,7 +51,7 @@ func TestKeys_ListKeysMultiplePages(t *testing.T) {
 
 	mux.HandleFunc("/v2/account/keys", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, http.MethodGet)
-		fmt.Fprint(w, `{"droplets": [{"id":1},{"id":2}], "links":{"pages":{"next":"http://example.com/v2/account/keys/?page=2"}}}`)
+		fmt.Fprint(w, `{"servers": [{"id":1},{"id":2}], "links":{"pages":{"next":"http://example.com/v2/account/keys/?page=2"}}}`)
 	})
 
 	_, resp, err := client.Keys.List(ctx, nil)
@@ -275,7 +275,7 @@ func TestKey_String(t *testing.T) {
 	}
 
 	stringified := key.String()
-	expected := `godo.Key{ID:123, Name:"Key", Fingerprint:"fingerprint", PublicKey:"public key"}`
+	expected := `binarylane.Key{ID:123, Name:"Key", Fingerprint:"fingerprint", PublicKey:"public key"}`
 	if expected != stringified {
 		t.Errorf("Key.String returned %+v, expected %+v", stringified, expected)
 	}
